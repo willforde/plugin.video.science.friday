@@ -3,6 +3,7 @@
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.xbmcutil" version="2.0.2"/>
+		<import addon="plugin.video.youtube" version="4.4.8"/>
 	</requires>
 	<extension library="addon.py" point="xbmc.python.pluginsource">
 		<provides>video</provides>
