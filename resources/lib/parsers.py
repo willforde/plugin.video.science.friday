@@ -33,6 +33,14 @@ class VideosParser(HTMLParser.HTMLParser):
 		self.divcount = None
 		self.section = 0
 		
+		# Fetch Quality Setting from Youtube Addon
+		try: setting = int(plugin.getAddonSetting("plugin.video.youtube", "hd_videos"))
+		except: self.isHD = None
+		else:
+			if setting == 1: self.isHD = False
+			elif setting == 0 or setting >= 2: self.isHD = True
+			else: self.isHD = None
+		
 		# Proceed with parsing
 		results = []
 		self.reset_lists()
@@ -48,7 +56,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		self.item = listitem.ListItem()
 		if self.contentVideo: self.item.urlParams["action"] = "PlayVideo"
 		else: self.item.urlParams["action"] = "PlayAudio"
-		self.item.setQualityIcon(True)
+		self.item.setQualityIcon(self.isHD)
 		self.item.setAudioInfo()
 	
 	def handle_starttag(self, tag, attrs):
@@ -115,6 +123,14 @@ class RecentParser(HTMLParser.HTMLParser):
 		self.section = 0
 		self.contentVideo = plugin["type"] == "video"
 		
+		# Fetch Quality Setting from Youtube Addon
+		try: setting = int(plugin.getAddonSetting("plugin.video.youtube", "hd_videos"))
+		except: self.isHD = None
+		else:
+			if setting == 1: self.isHD = False
+			elif setting == 0 or setting >= 2: self.isHD = True
+			else: self.isHD = None
+		
 		# Proceed with parsing
 		results = []
 		self.reset_lists()
@@ -130,7 +146,7 @@ class RecentParser(HTMLParser.HTMLParser):
 		self.item = listitem.ListItem()
 		if self.contentVideo: self.item.urlParams["action"] = "PlayVideo"
 		else: self.item.urlParams["action"] = "PlayAudio"
-		self.item.setQualityIcon(True)
+		self.item.setQualityIcon(self.isHD)
 		self.item.setAudioInfo()
 	
 	def handle_starttag(self, tag, attrs):
