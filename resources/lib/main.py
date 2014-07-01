@@ -104,7 +104,7 @@ class PlayVideo(listitem.PlayMedia):
 	def resolve(self):
 		# Create url for oembed api
 		url = BASEURL % plugin["url"]
-		sourceCode = urlhandler.urlread(url, 14400)# TTL = 4 Hours
+		sourceCode = urlhandler.urlread(url, 14400, stripEntity=False)# TTL = 4 Hours
 		
 		# Search for Internal Video Source url
 		if "video-permalink-player" in sourceCode and "video-permalink-player" in sourceCode and ("data-videosrc" in sourceCode or "data-flashvideosrc" in sourceCode):
@@ -123,7 +123,7 @@ class PlayAudio(listitem.PlayMedia):
 	def resolve(self):
 		# Create url for oembed api
 		url = BASEURL % plugin["url"]
-		sourceCode = urlhandler.urlread(url, 14400)# TTL = 4 Hours
+		sourceCode = urlhandler.urlread(url, 14400, stripEntity=False)# TTL = 4 Hours
 		import re
 		
 		# Search sourceCode for audo file
