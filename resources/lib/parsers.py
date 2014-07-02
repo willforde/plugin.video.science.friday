@@ -24,9 +24,12 @@ class VideosParser(HTMLParser.HTMLParser):
 	"""
 	Parses channel categorys, i.e http://www.sciencefriday.com/topics/space.html#page/bytopic/1
 	"""
-	def parse(self, html, contentType):
+	def parse(self, urlobject, contentType, encoding="utf8"):
+		return self.fromstring(urlobject.read(), contentType, encoding)
+	
+	def fromstring(self, html, contentType, encoding="utf8"):
 		""" Parses SourceCode and Scrape Categorys """
-
+		
 		# Class Vars
 		self.contentVideo = "video" in contentType
 		self.contentType = contentType
@@ -45,7 +48,9 @@ class VideosParser(HTMLParser.HTMLParser):
 		results = []
 		self.reset_lists()
 		self.append = results.append
-		try: self.feed(html)
+		try:
+			if encoding: self.feed(html.decode(encoding))
+			else: self.feed(html)
 		except plugin.ParserError: pass
 		
 		# Return Results
@@ -115,7 +120,10 @@ class RecentParser(HTMLParser.HTMLParser):
 	"""
 	Parses channel categorys, i.e http://www.sciencefriday.com/video/index.html#page/full-width-list/1
 	"""
-	def parse(self, html):
+	def parse(self, urlobject, encoding="utf8"):
+		return self.fromstring(urlobject.read(), encoding)
+	
+	def fromstring(self, html, encoding="utf8"):
 		""" Parses SourceCode and Scrape Categorys """
 
 		# Class Vars
@@ -135,7 +143,9 @@ class RecentParser(HTMLParser.HTMLParser):
 		results = []
 		self.reset_lists()
 		self.append = results.append
-		try: self.feed(html)
+		try:
+			if encoding: self.feed(html.decode(encoding))
+			else: self.feed(html)
 		except plugin.ParserError: pass
 		
 		# Return Results

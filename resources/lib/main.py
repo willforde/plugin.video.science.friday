@@ -74,8 +74,9 @@ class ContentLister(listitem.VirtualFS):
 	def scraper(self):
 		# Fetch Video Content
 		url = BASEURL % plugin["url"]
-		sourceCode = urlhandler.urlread(url, 14400) # TTL = 4 Hours
-		videoItems = parsers.VideosParser().parse(sourceCode, plugin["type"])
+		sourceObj = urlhandler.urlopen(url, 14400) # TTL = 4 Hours
+		videoItems = parsers.VideosParser().parse(sourceObj, plugin["type"])
+		sourceObj.close()
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_date, self.sort_method_video_title)
@@ -89,8 +90,9 @@ class Recent(listitem.VirtualFS):
 	def scraper(self):
 		# Fetch Video Content
 		url = BASEURL % plugin["url"]
-		sourceCode = urlhandler.urlread(url, 14400) # TTL = 4 Hours
-		videoItems = parsers.RecentParser().parse(sourceCode)
+		sourceObj = urlhandler.urlopen(url, 14400) # TTL = 4 Hours
+		videoItems = parsers.RecentParser().parse(sourceObj)
+		sourceObj.close()
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_date, self.sort_method_video_title)
