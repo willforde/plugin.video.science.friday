@@ -86,7 +86,7 @@ class VideosParser(HTMLParser.HTMLParser):
 				attrs = dict(attrs)
 				# Check for url and title
 				if self.section == 102 and u"href" in attrs:
-					self.item.urlParams[u"url"] = attrs[u"href"]
+					self.item.urlParams["url"] = attrs[u"href"]
 					self.section = 103
 		
 		# Fetch Image Block
@@ -182,7 +182,7 @@ class RecentParser(HTMLParser.HTMLParser):
 				attrs = dict(attrs)
 				# Check for url and title
 				if u"href" in attrs:
-					self.item.urlParams[u"url"] = attrs[u"href"]
+					self.item.urlParams["url"] = attrs[u"href"]
 					self.section = 103
 		
 		# Fetch Image Block
