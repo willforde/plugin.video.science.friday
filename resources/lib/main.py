@@ -25,7 +25,7 @@ class Initialize(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
 		# Fetch Video Content
-		url = BASEURL % "/about/about-science-friday.html"
+		url = BASEURL % u"/about/about-science-friday.html"
 		sourceCode = urlhandler.urlread(url, 604800) # TTL = 1 Week
 		
 		# Add Extra Items
@@ -49,21 +49,21 @@ class Initialize(listitem.VirtualFS):
 		import re
 		
 		# Deside on content type to show be default
-		if plugin.getSetting("defaultview") == "0": # Video
+		if plugin.getSetting("defaultview") == u"0": # Video
 			menuItem = plugin.getuni(30002)
-			contentType = ("video-list", "segment-list")
+			contentType = (u"video-list", u"segment-list")
 		
 		else: # Audio
 			menuItem = plugin.getuni(30003)
-			contentType = ("segment-list", "video-list")
+			contentType = (u"segment-list", u"video-list")
 		
 		# Loop each topic
 		for url, title in re.findall('<li><a\shref="(/topics/\S+?\.html)">(.+?)</a></li>', sourceCode):
 			# Create listitem of Data For Video
 			item = localListitem()
 			item.setLabel(title)
-			item.setParamDict(action="ContentLister", url="%s#page/bytopic/1" % url, type=contentType[0])
-			item.addContextMenuItem(menuItem, "XBMC.Container.Update", action="ContentLister", url="%s#page/bytopic/1" % url, type=contentType[1])
+			item.setParamDict(action="ContentLister", url=u"%s#page/bytopic/1" % url, type=contentType[0])
+			item.addContextMenuItem(menuItem, "XBMC.Container.Update", action="ContentLister", url=u"%s#page/bytopic/1" % url, type=contentType[1])
 			additem(item.getListitemTuple(False))
 			
 		# Return list of listitems
@@ -109,7 +109,7 @@ class PlayVideo(listitem.PlayMedia):
 		sourceCode = urlhandler.urlread(url, 14400, stripEntity=False)# TTL = 4 Hours
 		
 		# Search for Internal Video Source url
-		if "video-permalink-player" in sourceCode and "video-permalink-player" in sourceCode and ("data-videosrc" in sourceCode or "data-flashvideosrc" in sourceCode):
+		if u"video-permalink-player" in sourceCode and u"video-permalink-player" in sourceCode and (u"data-videosrc" in sourceCode or u"data-flashvideosrc" in sourceCode):
 			import re
 			plugin.debug("Found Internal Link")
 			for part1, part2 in re.findall('data-videosrc="(\S*?)"|data-flashvideosrc="(\S*?)"', sourceCode):
@@ -130,4 +130,4 @@ class PlayAudio(listitem.PlayMedia):
 		
 		# Search sourceCode for audo file
 		stitcher = re.findall('<a\sclass="stitcher-ll"\shref="(http://app\.stitcher\.com\S+?)"\starget="_blank">', sourceCode)[0]
-		return plugin.parse_qs(stitcher[stitcher.find("?")+1:])["url"]
+		return plugin.parse_qs(stitcher[stitcher.find(u"?")+1:])[u"url"]

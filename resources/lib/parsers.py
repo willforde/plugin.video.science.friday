@@ -80,22 +80,22 @@ class VideosParser(HTMLParser.HTMLParser):
 		# Fetch video info Block
 		elif self.divcount == 3:
 			# Check for Title, Plot and Date
-			if tag == "h4": self.section = 101
-			elif tag == "a":
+			if tag == u"h4": self.section = 101
+			elif tag == u"a":
 				# Convert Attributes to a Dictionary
 				attrs = dict(attrs)
 				# Check for url and title
 				if self.section == 102 and u"href" in attrs:
-					self.item.urlParams["url"] = attrs[u"href"]
+					self.item.urlParams[u"url"] = attrs[u"href"]
 					self.section = 103
 		
 		# Fetch Image Block
-		elif self.divcount == 5 and tag == "img":
+		elif self.divcount == 5 and tag == u"img":
 			# Convert Attributes to a Dictionary
 			attrs = dict(attrs)
 			# Fetch video Image
-			if "data-lazysrc" in attrs:
-				self.item.setThumbnailImage(attrs["data-lazysrc"])
+			if u"data-lazysrc" in attrs:
+				self.item.setThumbnailImage(attrs[u"data-lazysrc"])
 	
 	def handle_data(self, data):
 		# When within selected section fetch Time
@@ -175,23 +175,23 @@ class RecentParser(HTMLParser.HTMLParser):
 		# Fetch video info Block
 		elif self.divcount == 4:
 			# Check for Title, Plot and Date
-			if tag == "h4": self.section = 101
-			elif tag == "p": self.section = 102
-			elif tag == "a":
+			if tag == u"h4": self.section = 101
+			elif tag == u"p": self.section = 102
+			elif tag == u"a":
 				# Convert Attributes to a Dictionary
 				attrs = dict(attrs)
 				# Check for url and title
 				if u"href" in attrs:
-					self.item.urlParams["url"] = attrs[u"href"]
+					self.item.urlParams[u"url"] = attrs[u"href"]
 					self.section = 103
 		
 		# Fetch Image Block
-		elif self.divcount == 5 and tag == "img":
+		elif self.divcount == 5 and tag == u"img":
 			# Convert Attributes to a Dictionary
 			attrs = dict(attrs)
 			# Fetch video Image
-			if "data-lazysrc" in attrs:
-				self.item.setThumbnailImage(attrs["data-lazysrc"])
+			if u"data-lazysrc" in attrs:
+				self.item.setThumbnailImage(attrs[u"data-lazysrc"])
 	
 	def handle_data(self, data):
 		# When within selected section fetch Time
