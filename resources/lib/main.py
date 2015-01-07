@@ -36,7 +36,6 @@ class Initialize(listitem.VirtualFS):
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_video_title)
-		self.set_content("files")
 		
 		# Fetch and Return VideoItems
 		return self.regex_scraper(sourceCode)
@@ -80,7 +79,6 @@ class ContentLister(listitem.VirtualFS):
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_date, self.sort_method_video_title)
-		self.set_content("episodes")
 		
 		# Return List of Video Listitems
 		return videoItems
@@ -96,7 +94,6 @@ class Recent(listitem.VirtualFS):
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_date, self.sort_method_video_title)
-		self.set_content("episodes")
 		
 		# Return List of Video Listitems
 		return videoItems
