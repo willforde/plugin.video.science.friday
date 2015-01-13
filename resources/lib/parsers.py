@@ -62,7 +62,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		if self.contentVideo: self.item.urlParams["action"] = "PlayVideo"
 		else: self.item.urlParams["action"] = "PlayAudio"
 		self.item.setQualityIcon(self.isHD)
-		self.item.setAudioInfo()
+		self.item.setAudioFlags()
 	
 	def handle_starttag(self, tag, attrs):
 		# Convert Attributes to a Dictionary
@@ -95,12 +95,12 @@ class VideosParser(HTMLParser.HTMLParser):
 			attrs = dict(attrs)
 			# Fetch video Image
 			if u"data-lazysrc" in attrs:
-				self.item.setThumbnailImage(attrs[u"data-lazysrc"])
+				self.item.setThumb(attrs[u"data-lazysrc"])
 	
 	def handle_data(self, data):
 		# When within selected section fetch Time
 		if self.section == 101: # Date
-			self.item.setDateInfo(data, "%b. %d, %Y")
+			self.item.setDate(data, "%b. %d, %Y")
 			self.section = 102
 		elif self.section == 103: # Title
 			self.item.setLabel(data)
@@ -157,7 +157,7 @@ class RecentParser(HTMLParser.HTMLParser):
 		if self.contentVideo: self.item.urlParams["action"] = "PlayVideo"
 		else: self.item.urlParams["action"] = "PlayAudio"
 		self.item.setQualityIcon(self.isHD)
-		self.item.setAudioInfo()
+		self.item.setAudioFlags()
 	
 	def handle_starttag(self, tag, attrs):
 		# Convert Attributes to a Dictionary
@@ -191,12 +191,12 @@ class RecentParser(HTMLParser.HTMLParser):
 			attrs = dict(attrs)
 			# Fetch video Image
 			if u"data-lazysrc" in attrs:
-				self.item.setThumbnailImage(attrs[u"data-lazysrc"])
+				self.item.setThumb(attrs[u"data-lazysrc"])
 	
 	def handle_data(self, data):
 		# When within selected section fetch Time
 		if self.section == 101: # Date
-			self.item.setDateInfo(data, "%b. %d, %Y")
+			self.item.setDate(data, "%b. %d, %Y")
 			self.section = 0
 		elif self.section == 102: # Plot
 			self.item.infoLabels["plot"] = data.strip()
