@@ -61,6 +61,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		self.item = listitem.ListItem()
 		if self.contentVideo: self.item.urlParams["action"] = "PlayVideo"
 		else: self.item.urlParams["action"] = "PlayAudio"
+		self.item.setQualityIcon(self.isHD)
 		self.item.setAudioFlags()
 	
 	def handle_starttag(self, tag, attrs):
@@ -112,7 +113,7 @@ class VideosParser(HTMLParser.HTMLParser):
 			
 			# When at closeing tag for show-block, save fetched data
 			if self.divcount == 1:
-				self.append(self.item.getListitemTuple(True, self.isHD))
+				self.append(self.item.getListitemTuple(True))
 				self.reset_lists()
 
 class RecentParser(HTMLParser.HTMLParser):
@@ -155,6 +156,7 @@ class RecentParser(HTMLParser.HTMLParser):
 		self.item = listitem.ListItem()
 		if self.contentVideo: self.item.urlParams["action"] = "PlayVideo"
 		else: self.item.urlParams["action"] = "PlayAudio"
+		self.item.setQualityIcon(self.isHD)
 		self.item.setAudioFlags()
 	
 	def handle_starttag(self, tag, attrs):
@@ -210,5 +212,5 @@ class RecentParser(HTMLParser.HTMLParser):
 			
 			# When at closeing tag for show-block, save fetched data
 			if self.divcount == 1:
-				self.append(self.item.getListitemTuple(True, self.isHD))
+				self.append(self.item.getListitemTuple(True))
 				self.reset_lists()
