@@ -61,7 +61,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		self.item = listitem.ListItem()
 		if self.contentVideo: self.item.urlParams["action"] = "PlayVideo"
 		else: self.item.urlParams["action"] = "PlayAudio"
-		self.item.setQualityIcon(self.isHD)
+		self.item.setVideoFlags(self.isHD)
 		self.item.setAudioFlags()
 	
 	def handle_starttag(self, tag, attrs):
@@ -156,7 +156,7 @@ class RecentParser(HTMLParser.HTMLParser):
 		self.item = listitem.ListItem()
 		if self.contentVideo: self.item.urlParams["action"] = "PlayVideo"
 		else: self.item.urlParams["action"] = "PlayAudio"
-		self.item.setQualityIcon(self.isHD)
+		self.item.setVideoFlags(self.isHD)
 		self.item.setAudioFlags()
 	
 	def handle_starttag(self, tag, attrs):
