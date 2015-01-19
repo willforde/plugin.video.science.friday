@@ -42,8 +42,6 @@ class Initialize(listitem.VirtualFS):
 	
 	def regex_scraper(self, sourceCode):
 		# Create Speed vars
-		results = []
-		additem = results.append
 		localListitem = listitem.ListItem
 		import re
 		
@@ -63,10 +61,7 @@ class Initialize(listitem.VirtualFS):
 			item.setLabel(title)
 			item.setParamDict(action="ContentLister", url=u"%s#page/bytopic/1" % url, type=contentType[0])
 			item.addContextMenuItem(menuItem, "XBMC.Container.Update", action="ContentLister", url=u"%s#page/bytopic/1" % url, type=contentType[1])
-			additem(item.getListitemTuple(False))
-			
-		# Return list of listitems
-		return results
+			yield item.getListitemTuple(False)
 
 class ContentLister(listitem.VirtualFS):
 	@plugin.error_handler
