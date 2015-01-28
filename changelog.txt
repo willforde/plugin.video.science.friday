@@ -1,6 +1,7 @@
 [B]Version 1.0.1[/B] 2015-01-19
 - Removed set_content call
 - Change to return a generator instead of a list
+- Added option to view alternative list from other list
 - Fix some small encoding issue
 - Some small method renames
 
