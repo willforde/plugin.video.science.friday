@@ -69,6 +69,10 @@ class ContentLister(listitem.VirtualFS):
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_date, self.sort_method_video_title)
 		
+		# Add link to Alternitve Listing
+		if plugin["type"] == "video-list": self.add_item("-%s" % plugin.getuni(30002), url={"action":"ContentLister", "updatelisting":"true", "url":plugin["url"], "type":"segment-list"})
+		else: self.add_item("-%s" % plugin.getuni(30003), url={"action":"ContentLister", "url":plugin["url"], "type":"video-list"})
+		
 		# Fetch Video Content
 		url = BASEURL % plugin["url"]
 		with urlhandler.urlopen(url, 14400) as sourceObj: # TTL = 4 Hours
