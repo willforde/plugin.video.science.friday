@@ -66,32 +66,24 @@ class Initialize(listitem.VirtualFS):
 class ContentLister(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
-		# Fetch Video Content
-		url = BASEURL % plugin["url"]
-		sourceObj = urlhandler.urlopen(url, 14400) # TTL = 4 Hours
-		videoItems = parsers.VideosParser().parse(sourceObj, plugin["type"])
-		sourceObj.close()
-		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_date, self.sort_method_video_title)
 		
-		# Return List of Video Listitems
-		return videoItems
+		# Fetch Video Content
+		url = BASEURL % plugin["url"]
+		with urlhandler.urlopen(url, 14400) as sourceObj: # TTL = 4 Hours
+			return parsers.VideosParser().parse(sourceObj, plugin["type"])
 
 class Recent(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
-		# Fetch Video Content
-		url = BASEURL % plugin["url"]
-		sourceObj = urlhandler.urlopen(url, 14400) # TTL = 4 Hours
-		videoItems = parsers.RecentParser().parse(sourceObj)
-		sourceObj.close()
-		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_date, self.sort_method_video_title)
 		
-		# Return List of Video Listitems
-		return videoItems
+		# Fetch Video Content
+		url = BASEURL % plugin["url"]
+		with urlhandler.urlopen(url, 14400) as sourceObj: # TTL = 4 Hours
+			return parsers.RecentParser().parse(sourceObj)
 
 class PlayVideo(listitem.PlayMedia):
 	@plugin.error_handler
