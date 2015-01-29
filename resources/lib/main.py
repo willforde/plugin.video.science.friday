@@ -34,9 +34,6 @@ class Initialize(listitem.VirtualFS):
 		self.add_item(u"-%s" % plugin.getuni(30101), thumbnail=icon, url={"action":"Recent", "url":"/video/index.html#page/full-width-list/1", "type":"video"})
 		self.add_item(u"-%s" % plugin.getuni(30102), thumbnail=icon, url={"action":"Recent", "url":"/audio/index.html#page/full-width-list/1", "type":"audio"})
 		
-		# Set Content Properties
-		self.set_sort_methods(self.sort_method_video_title)
-		
 		# Fetch and Return VideoItems
 		return self.regex_scraper(sourceCode)
 	
@@ -66,9 +63,6 @@ class Initialize(listitem.VirtualFS):
 class ContentLister(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
-		# Set Content Properties
-		self.set_sort_methods(self.sort_method_date, self.sort_method_video_title)
-		
 		# Add link to Alternitve Listing
 		if plugin["type"] == "video-list": self.add_item("-%s" % plugin.getuni(30002), url={"action":"ContentLister", "updatelisting":"true", "url":plugin["url"], "type":"segment-list"})
 		else: self.add_item("-%s" % plugin.getuni(30003), url={"action":"ContentLister", "url":plugin["url"], "type":"video-list"})
@@ -81,9 +75,6 @@ class ContentLister(listitem.VirtualFS):
 class Recent(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
-		# Set Content Properties
-		self.set_sort_methods(self.sort_method_date, self.sort_method_video_title)
-		
 		# Fetch Video Content
 		url = BASEURL % plugin["url"]
 		with urlhandler.urlopen(url, 14400) as sourceObj: # TTL = 4 Hours
