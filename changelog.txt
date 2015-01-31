@@ -2,6 +2,7 @@
 - Fixed some small encoding issue
 - Added option to view alternative list from other list
 - Change to return a generator instead of a list
+- Changed settings.xml to use new methods for setting view mode
 - Removed xbmcutil.cleanup try finally catch
 - Removed unneeded set_sort_methods
 - Removed set_content call
