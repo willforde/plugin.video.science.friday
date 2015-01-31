@@ -4,10 +4,8 @@
 		<setting id="defaultview" type="enum" label="30001" lvalues="291|292" default="0"/>
 		<!-- ViewModes -->
 		<setting type="sep" />
-		<setting id="files" type="enum" label="$ADDON[script.module.xbmcutil 32921]" lvalues="571|537|21371|636" default="0" />
-		<setting id="filescustom" type="number" label="$ADDON[script.module.xbmcutil 32923]" visible="eq(-1,3)" />
-		<setting id="episodes" type="enum" label="$ADDON[script.module.xbmcutil 32922]" lvalues="571|537|21371|636" default="0" />
-		<setting id="episodescustom" type="number" label="$ADDON[script.module.xbmcutil 32923]" visible="eq(-1,3)" />
+		<setting label="$ADDON[script.module.xbmcutil 32921]" type="action" action="RunScript(plugin.video.science.friday, setViewMode, folder)"/>
+		<setting label="$ADDON[script.module.xbmcutil 32922]" type="action" action="RunScript(plugin.video.science.friday, setViewMode, video)"/>
 		<!-- Downloads -->
 		<setting type="sep" />
 		<setting id="downloadpath" type="folder" label="$ADDON[script.module.xbmcutil 32924]" source="video" option="writeable" default="" />
