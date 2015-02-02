@@ -5,6 +5,7 @@
 - Changed settings.xml to use new methods for setting view mode
 - Removed xbmcutil.cleanup try finally catch
 - Removed unneeded set_sort_methods
+- Removed download support
 - Removed set_content call
 - Switch to using with steatment
 - Some small method renames
