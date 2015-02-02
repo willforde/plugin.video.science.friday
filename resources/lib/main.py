@@ -25,14 +25,15 @@ class Initialize(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
 		# Fetch Video Content
+		_plugin = plugin
 		url = BASEURL % u"/about/about-science-friday.html"
 		sourceCode = urlhandler.urlread(url, 604800) # TTL = 1 Week
 		
 		# Add Extra Items
-		icon = (plugin.getIcon(),0)
+		icon = (_plugin.getIcon(),0)
 		self.add_youtube_channel("SciFri", hasPlaylist=True, hasHD=True)
-		self.add_item(u"-%s" % plugin.getuni(30101), thumbnail=icon, url={"action":"Recent", "url":"/video/index.html#page/full-width-list/1", "type":"video"})
-		self.add_item(u"-%s" % plugin.getuni(30102), thumbnail=icon, url={"action":"Recent", "url":"/audio/index.html#page/full-width-list/1", "type":"audio"})
+		self.add_item(u"-%s" % _plugin.getuni(30101), thumbnail=icon, url={"action":"Recent", "url":"/video/index.html#page/full-width-list/1", "type":"video"})
+		self.add_item(u"-%s" % _plugin.getuni(30102), thumbnail=icon, url={"action":"Recent", "url":"/audio/index.html#page/full-width-list/1", "type":"audio"})
 		
 		# Fetch and Return VideoItems
 		return self.regex_scraper(sourceCode)
@@ -40,15 +41,16 @@ class Initialize(listitem.VirtualFS):
 	def regex_scraper(self, sourceCode):
 		# Create Speed vars
 		localListitem = listitem.ListItem
+		_plugin = plugin
 		import re
 		
 		# Deside on content type to show be default
-		if plugin.getSetting("defaultview") == u"0": # Video
-			menuItem = plugin.getuni(30002)
+		if _plugin.getSetting("defaultview") == u"0": # Video
+			menuItem = _plugin.getuni(30002)
 			contentType = (u"video-list", u"segment-list")
 		
 		else: # Audio
-			menuItem = plugin.getuni(30003)
+			menuItem = _plugin.getuni(30003)
 			contentType = (u"segment-list", u"video-list")
 		
 		# Loop each topic
@@ -63,14 +65,15 @@ class Initialize(listitem.VirtualFS):
 class ContentLister(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
+		_plugin = plugin
 		# Add link to Alternitve Listing
-		if plugin["type"] == "video-list": self.add_item("-%s" % plugin.getuni(30002), url={"action":"ContentLister", "updatelisting":"true", "url":plugin["url"], "type":"segment-list"})
-		else: self.add_item("-%s" % plugin.getuni(30003), url={"action":"ContentLister", "url":plugin["url"], "type":"video-list"})
+		if _plugin["type"] == "video-list": self.add_item("-%s" % _plugin.getuni(30002), url={"action":"ContentLister", "updatelisting":"true", "url":_plugin["url"], "type":"segment-list"})
+		else: self.add_item("-%s" % _plugin.getuni(30003), url={"action":"ContentLister", "url":_plugin["url"], "type":"video-list"})
 		
 		# Fetch Video Content
-		url = BASEURL % plugin["url"]
+		url = BASEURL % _plugin["url"]
 		with urlhandler.urlopen(url, 14400) as sourceObj: # TTL = 4 Hours
-			return parsers.VideosParser().parse(sourceObj, plugin["type"])
+			return parsers.VideosParser().parse(sourceObj, _plugin["type"])
 
 class Recent(listitem.VirtualFS):
 	@plugin.error_handler
@@ -80,7 +83,7 @@ class Recent(listitem.VirtualFS):
 		with urlhandler.urlopen(url, 14400) as sourceObj: # TTL = 4 Hours
 			return parsers.RecentParser().parse(sourceObj)
 
-class PlayVideo(listitem.PlayMedia):
+class PlayVideo(listitem.PlaySource):
 	@plugin.error_handler
 	def resolve(self):
 		# Create url for oembed api
@@ -97,7 +100,7 @@ class PlayVideo(listitem.PlayMedia):
 			return url[0]
 		else:
 			# Atempt to Find External Video Source
-			return self.sources(sourceCode)
+			return self.sourceParse(sourceCode)
 
 class PlayAudio(listitem.PlayMedia):
 	@plugin.error_handler
