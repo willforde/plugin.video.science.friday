@@ -31,18 +31,15 @@ class VideosParser(HTMLParser.HTMLParser):
 		""" Parses SourceCode and Scrape Categorys """
 		
 		# Class Vars
+		_plugin = plugin
 		self.contentVideo = "video" in contentType
 		self.contentType = contentType
 		self.divcount = None
 		self.section = 0
 		
 		# Fetch Quality Setting from Youtube Addon
-		try: setting = int(plugin.getAddonSetting("plugin.video.youtube", "hd_videos"))
-		except: self.isHD = None
-		else:
-			if setting == 1: self.isHD = False
-			elif setting == 0 or setting >= 2: self.isHD = True
-			else: self.isHD = None
+		if _plugin["type"] == u"video-list": self.isHD = _plugin.isYoutubeHD()
+		else: self.isHD = None
 		
 		# Proceed with parsing
 		results = []
@@ -51,7 +48,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		try:
 			if encoding: self.feed(html.decode(encoding))
 			else: self.feed(html)
-		except plugin.ParserError: pass
+		except _plugin.ParserError: pass
 		
 		# Return Results
 		return results
@@ -127,17 +124,17 @@ class RecentParser(HTMLParser.HTMLParser):
 		""" Parses SourceCode and Scrape Categorys """
 
 		# Class Vars
+		_plugin = plugin
 		self.divcount = None
 		self.section = 0
-		self.contentVideo = plugin["type"] == "video"
 		
 		# Fetch Quality Setting from Youtube Addon
-		try: setting = int(plugin.getAddonSetting("plugin.video.youtube", "hd_videos"))
-		except: self.isHD = None
+		if _plugin["type"] == "video":
+			self.contentAction = "PlayVideo"
+			self.isHD = _plugin.isYoutubeHD()
 		else:
-			if setting == 1: self.isHD = False
-			elif setting == 0 or setting >= 2: self.isHD = True
-			else: self.isHD = None
+			self.contentAction = "PlayAudio"
+			self.isHD = None
 		
 		# Proceed with parsing
 		results = []
@@ -146,7 +143,7 @@ class RecentParser(HTMLParser.HTMLParser):
 		try:
 			if encoding: self.feed(html.decode(encoding))
 			else: self.feed(html)
-		except plugin.ParserError: pass
+		except _plugin.ParserError: pass
 		
 		# Return Results
 		return results
@@ -154,8 +151,7 @@ class RecentParser(HTMLParser.HTMLParser):
 	def reset_lists(self):
 		# Reset List for Next Run
 		self.item = listitem.ListItem()
-		if self.contentVideo: self.item.urlParams["action"] = "PlayVideo"
-		else: self.item.urlParams["action"] = "PlayAudio"
+		self.item.urlParams["action"] = self.contentAction
 		self.item.setVideoFlags(self.isHD)
 		self.item.setAudioFlags()
 	
