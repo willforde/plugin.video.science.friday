@@ -46,11 +46,11 @@ class Initialize(listitem.VirtualFS):
 		
 		# Deside on content type to show be default
 		if _plugin.getSetting("defaultview") == u"0": # Video
-			menuItem = _plugin.getuni(30002)
+			menuItem = _plugin.getuni(30103)
 			contentType = (u"video-list", u"segment-list")
 		
 		else: # Audio
-			menuItem = _plugin.getuni(30003)
+			menuItem = _plugin.getuni(30104)
 			contentType = (u"segment-list", u"video-list")
 		
 		# Loop each topic
@@ -67,8 +67,8 @@ class ContentLister(listitem.VirtualFS):
 	def scraper(self):
 		_plugin = plugin
 		# Add link to Alternitve Listing
-		if _plugin["type"] == "video-list": self.add_item("-%s" % _plugin.getuni(30002), url={"action":"ContentLister", "updatelisting":"true", "url":_plugin["url"], "type":"segment-list"})
-		else: self.add_item("-%s" % _plugin.getuni(30003), url={"action":"ContentLister", "url":_plugin["url"], "type":"video-list"})
+		if _plugin["type"] == "video-list": self.add_item("-%s" % _plugin.getuni(30103), url={"action":"ContentLister", "updatelisting":"true", "url":_plugin["url"], "type":"segment-list"})
+		else: self.add_item("-%s" % _plugin.getuni(30104), url={"action":"ContentLister", "url":_plugin["url"], "type":"video-list"})
 		
 		# Fetch Video Content
 		url = BASEURL % _plugin["url"]
