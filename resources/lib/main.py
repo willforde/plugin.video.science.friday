@@ -68,7 +68,7 @@ class ContentLister(listitem.VirtualFS):
 		_plugin = plugin
 		# Add link to Alternitve Listing
 		if _plugin["type"] == u"video-list": self.add_item("-%s" % _plugin.getuni(30103), url={"action":"ContentLister", "updatelisting":"true", "url":_plugin["url"], "type":"segment-list"})
-		else: self.add_item("-%s" % _plugin.getuni(30104), url={"action":"ContentLister", "url":_plugin["url"], "type":"video-list"})
+		else: self.add_item("-%s" % _plugin.getuni(30104), url={"action":"ContentLister", "updatelisting":"true", "url":_plugin["url"], "type":"video-list"})
 		
 		# Fetch Video Content
 		url = BASEURL % _plugin["url"]
