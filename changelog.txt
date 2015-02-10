@@ -1,4 +1,4 @@
-[B]Version 1.0.1[/B] 2015-01-19
+[B]Version 2.0.0[/B] 2015-02-10
 - Fixed some small encoding issue
 - Added option to view alternative list from other list
 - Change to return a generator instead of a list
