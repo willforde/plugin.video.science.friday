@@ -21,9 +21,7 @@ import HTMLParser
 from xbmcutil import listitem, plugin
 
 class VideosParser(HTMLParser.HTMLParser):
-	"""
-	Parses channel categorys, i.e http://www.sciencefriday.com/topics/space.html#page/bytopic/1
-	"""
+	""" Parses Videos, i.e http://www.sciencefriday.com/topics/space.html#page/bytopic/1 """
 	def parse(self, urlobject, contentType, encoding="utf8"):
 		return self.fromstring(urlobject.read(), contentType, encoding)
 	
@@ -32,7 +30,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		
 		# Class Vars
 		_plugin = plugin
-		self.contentVideo = "video" in contentType
+		self.contentVideo = "PlayVideo" if "video" in contentType else "PlayAudio"
 		self.contentType = contentType
 		self.divcount = None
 		self.section = 0
@@ -48,7 +46,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		try:
 			if encoding: self.feed(html.decode(encoding))
 			else: self.feed(html)
-		except _plugin.ParserError: pass
+		except EOFError: pass
 		
 		# Return Results
 		return results
@@ -56,43 +54,42 @@ class VideosParser(HTMLParser.HTMLParser):
 	def reset_lists(self):
 		# Reset List for Next Run
 		self.item = listitem.ListItem()
-		if self.contentVideo: self.item.urlParams["action"] = "PlayVideo"
-		else: self.item.urlParams["action"] = "PlayAudio"
+		self.item.urlParams["action"] = self.contentVideo
 		self.item.setVideoFlags(self.isHD)
 		self.item.setAudioFlags()
 	
 	def handle_starttag(self, tag, attrs):
 		# Convert Attributes to a Dictionary
-		if self.divcount == 0: raise plugin.ParserError
+		if self.divcount == 0: raise EOFError
 		elif tag == u"div":
 			# Increment div counter when within show-block
 			if self.divcount: self.divcount +=1
 			else:
-				# Convert Attributes to a Dictionary
-				attrs = dict(attrs)
-				
 				# Check for required section
-				if u"id" in attrs and attrs[u"id"] == self.contentType: self.divcount = 1
+				for key, value in attrs:
+					if key == u"id" and value == self.contentType:
+						self.divcount = 1
+						break
 			
 		# Fetch video info Block
 		elif self.divcount == 3:
 			# Check for Title, Plot and Date
 			if tag == u"h4": self.section = 101
-			elif tag == u"a":
-				# Convert Attributes to a Dictionary
-				attrs = dict(attrs)
+			elif tag == u"a" and self.section == 102:
 				# Check for url and title
-				if self.section == 102 and u"href" in attrs:
-					self.item.urlParams["url"] = attrs[u"href"]
-					self.section = 103
+				for key, value in attrs:
+					if key == u"href":
+						self.item.urlParams["url"] = value
+						self.section = 103
+						break
 		
 		# Fetch Image Block
 		elif self.divcount == 5 and tag == u"img":
-			# Convert Attributes to a Dictionary
-			attrs = dict(attrs)
 			# Fetch video Image
-			if u"data-lazysrc" in attrs:
-				self.item.setThumb(attrs[u"data-lazysrc"])
+			for key, value in attrs:
+				if key == u"data-lazysrc":
+					self.item.setThumb(value)
+					break
 	
 	def handle_data(self, data):
 		# When within selected section fetch Time
@@ -114,9 +111,7 @@ class VideosParser(HTMLParser.HTMLParser):
 				self.reset_lists()
 
 class RecentParser(HTMLParser.HTMLParser):
-	"""
-	Parses channel categorys, i.e http://www.sciencefriday.com/video/index.html#page/full-width-list/1
-	"""
+	""" Parses Recent Videos, i.e http://www.sciencefriday.com/video/index.html#page/full-width-list/1 """
 	def parse(self, urlobject, encoding="utf8"):
 		return self.fromstring(urlobject.read(), encoding)
 	
@@ -143,7 +138,7 @@ class RecentParser(HTMLParser.HTMLParser):
 		try:
 			if encoding: self.feed(html.decode(encoding))
 			else: self.feed(html)
-		except _plugin.ParserError: pass
+		except EOFError: pass
 		
 		# Return Results
 		return results
@@ -157,16 +152,16 @@ class RecentParser(HTMLParser.HTMLParser):
 	
 	def handle_starttag(self, tag, attrs):
 		# Convert Attributes to a Dictionary
-		if self.divcount == 0: raise plugin.ParserError
+		if self.divcount == 0: raise EOFError
 		elif tag == u"div":
 			# Increment div counter when within show-block
 			if self.divcount: self.divcount +=1
 			else:
-				# Convert Attributes to a Dictionary
-				attrs = dict(attrs)
-				
 				# Check for required section
-				if u"id" in attrs and attrs[u"id"] == u"full-width-list": self.divcount = 1
+				for key, value in attrs:
+					if key == u"id" and value == u"full-width-list":
+						self.divcount = 1
+						break
 			
 		# Fetch video info Block
 		elif self.divcount == 4:
@@ -174,20 +169,20 @@ class RecentParser(HTMLParser.HTMLParser):
 			if tag == u"h4": self.section = 101
 			elif tag == u"p": self.section = 102
 			elif tag == u"a":
-				# Convert Attributes to a Dictionary
-				attrs = dict(attrs)
 				# Check for url and title
-				if u"href" in attrs:
-					self.item.urlParams["url"] = attrs[u"href"]
-					self.section = 103
+				for key, value in attrs:
+					if key == u"href":
+						self.item.urlParams["url"] = value
+						self.section = 103
+						break
 		
 		# Fetch Image Block
 		elif self.divcount == 5 and tag == u"img":
-			# Convert Attributes to a Dictionary
-			attrs = dict(attrs)
 			# Fetch video Image
-			if u"data-lazysrc" in attrs:
-				self.item.setThumb(attrs[u"data-lazysrc"])
+			for key, value in attrs:
+				if key == u"data-lazysrc":
+					self.item.setThumb(value)
+					break
 	
 	def handle_data(self, data):
 		# When within selected section fetch Time
