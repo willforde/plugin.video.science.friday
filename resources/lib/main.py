@@ -47,19 +47,21 @@ class Initialize(listitem.VirtualFS):
 		# Deside on content type to show be default
 		if _plugin.getSetting("defaultview") == u"0": # Video
 			menuItem = _plugin.getuni(30103)
-			contentType = (u"video-list", u"segment-list")
+			localType = u"video-list"
+			contextType = u"segment-list"
 		
 		else: # Audio
 			menuItem = _plugin.getuni(30104)
-			contentType = (u"segment-list", u"video-list")
+			localType = u"segment-list"
+			contextType = u"video-list"
 		
 		# Loop each topic
 		for url, title in re.findall('<li><a\shref="(/topics/\S+?\.html)">(.+?)</a></li>', sourceCode):
 			# Create listitem of Data For Video
 			item = localListitem()
 			item.setLabel(title)
-			item.setParamDict(action="ContentLister", url=u"%s#page/bytopic/1" % url, type=contentType[0])
-			item.addContextMenuItem(menuItem, "XBMC.Container.Update", action="ContentLister", url=u"%s#page/bytopic/1" % url, type=contentType[1])
+			item.setParamDict(action="ContentLister", url=u"%s#page/bytopic/1" % url, type=localType)
+			item.addContextMenuItem(menuItem, "XBMC.Container.Update", action="ContentLister", url=u"%s#page/bytopic/1" % url, type=contextType)
 			yield item.getListitemTuple(False)
 
 class ContentLister(listitem.VirtualFS):
