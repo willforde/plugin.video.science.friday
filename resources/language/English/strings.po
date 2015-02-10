@@ -1,4 +1,4 @@
-# XBMC Media Center language file
+# Kodi Media Center language file
 # Addon Name: Science Friday
 # Addon id: plugin.video.science.friday
 # Addon Provider: willforde
