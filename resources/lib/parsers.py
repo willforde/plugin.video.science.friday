@@ -60,10 +60,11 @@ class VideosParser(HTMLParser.HTMLParser):
 	
 	def handle_starttag(self, tag, attrs):
 		# Convert Attributes to a Dictionary
-		if self.divcount == 0: raise EOFError
+		divcount = self.divcount
+		if divcount == 0: raise EOFError
 		elif tag == u"div":
 			# Increment div counter when within show-block
-			if self.divcount: self.divcount +=1
+			if divcount: self.divcount +=1
 			else:
 				# Check for required section
 				for key, value in attrs:
@@ -72,7 +73,7 @@ class VideosParser(HTMLParser.HTMLParser):
 						break
 			
 		# Fetch video info Block
-		elif self.divcount == 3:
+		elif divcount == 3:
 			# Check for Title, Plot and Date
 			if tag == u"h4": self.section = 101
 			elif tag == u"a" and self.section == 102:
@@ -84,7 +85,7 @@ class VideosParser(HTMLParser.HTMLParser):
 						break
 		
 		# Fetch Image Block
-		elif self.divcount == 5 and tag == u"img":
+		elif divcount == 5 and tag == u"img":
 			# Fetch video Image
 			for key, value in attrs:
 				if key == u"data-lazysrc":
