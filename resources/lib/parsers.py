@@ -20,6 +20,7 @@
 import HTMLParser
 from xbmcutil import listitem, plugin
 
+BaseURL = u"http://www.sciencefriday.com%s"
 class VideosParser(HTMLParser.HTMLParser):
 	""" Parses Videos, i.e http://www.sciencefriday.com/topics/space.html#page/bytopic/1 """
 	def parse(self, urlobject, contentType, encoding="utf8"):
@@ -89,7 +90,7 @@ class VideosParser(HTMLParser.HTMLParser):
 			# Fetch video Image
 			for key, value in attrs:
 				if key == u"data-lazysrc":
-					self.item.setThumb(value)
+					self.item.setThumb(BaseURL % value)
 					break
 	
 	def handle_data(self, data):
@@ -182,7 +183,7 @@ class RecentParser(HTMLParser.HTMLParser):
 			# Fetch video Image
 			for key, value in attrs:
 				if key == u"data-lazysrc":
-					self.item.setThumb(value)
+					self.item.setThumb(BaseURL % value)
 					break
 	
 	def handle_data(self, data):
