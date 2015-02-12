@@ -30,10 +30,10 @@ class Initialize(listitem.VirtualFS):
 		sourceCode = urlhandler.urlread(url, 604800) # TTL = 1 Week
 		
 		# Add Extra Items
-		icon = (_plugin.getIcon(),0)
+		self.icon = icon = _plugin.getIcon()
 		self.add_youtube_channel("SciFri", hasPlaylist=True, hasHD=True)
-		self.add_item(u"-%s" % _plugin.getuni(30101), thumbnail=icon, url={"action":"Recent", "url":"/video/index.html#page/full-width-list/1", "type":"video"})
-		self.add_item(u"-%s" % _plugin.getuni(30102), thumbnail=icon, url={"action":"Recent", "url":"/audio/index.html#page/full-width-list/1", "type":"audio"})
+		self.add_item(u"-%s" % _plugin.getuni(30101), thumbnail=(icon,0), url={"action":"Recent", "url":"/video/index.html#page/full-width-list/1", "type":"video"})
+		self.add_item(u"-%s" % _plugin.getuni(30102), thumbnail=(icon,0), url={"action":"Recent", "url":"/audio/index.html#page/full-width-list/1", "type":"audio"})
 		
 		# Fetch and Return VideoItems
 		return self.regex_scraper(sourceCode)
@@ -42,6 +42,7 @@ class Initialize(listitem.VirtualFS):
 		# Create Speed vars
 		localListitem = listitem.ListItem
 		_plugin = plugin
+		icon = self.icon
 		import re
 		
 		# Deside on content type to show be default
@@ -60,6 +61,7 @@ class Initialize(listitem.VirtualFS):
 			# Create listitem of Data For Video
 			item = localListitem()
 			item.setLabel(title)
+			item.setThumb(icon)
 			item.setParamDict(action="ContentLister", url=u"%s#page/bytopic/1" % url, type=localType)
 			item.addContextMenuItem(menuItem, "XBMC.Container.Update", action="ContentLister", url=u"%s#page/bytopic/1" % url, type=contextType)
 			yield item.getListitemTuple(False)
@@ -69,8 +71,8 @@ class ContentLister(listitem.VirtualFS):
 	def scraper(self):
 		_plugin = plugin
 		# Add link to Alternitve Listing
-		if _plugin["type"] == u"video-list": self.add_item("-%s" % _plugin.getuni(30103), url={"action":"ContentLister", "updatelisting":"true", "url":_plugin["url"], "type":"segment-list"})
-		else: self.add_item("-%s" % _plugin.getuni(30104), url={"action":"ContentLister", "updatelisting":"true", "url":_plugin["url"], "type":"video-list"})
+		if _plugin["type"] == u"video-list": self.add_item("-%s" % _plugin.getuni(30103), thumbnail=(_plugin.getIcon(),0), url={"action":"ContentLister", "updatelisting":"true", "url":_plugin["url"], "type":"segment-list"})
+		else: self.add_item("-%s" % _plugin.getuni(30104), thumbnail=(_plugin.getIcon(),0), url={"action":"ContentLister", "updatelisting":"true", "url":_plugin["url"], "type":"video-list"})
 		
 		# Fetch Video Content
 		url = BASEURL % _plugin["url"]
