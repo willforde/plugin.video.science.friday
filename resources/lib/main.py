@@ -31,9 +31,9 @@ class Initialize(listitem.VirtualFS):
 		
 		# Add Extra Items
 		self.icon = icon = _plugin.getIcon()
-		self.add_youtube_channel("SciFri", hasPlaylist=True, hasHD=True)
-		self.add_item(u"-%s" % _plugin.getuni(30101), thumbnail=(icon,0), url={"action":"Recent", "url":"/video/index.html#page/full-width-list/1", "type":"video"})
-		self.add_item(u"-%s" % _plugin.getuni(30102), thumbnail=(icon,0), url={"action":"Recent", "url":"/audio/index.html#page/full-width-list/1", "type":"audio"})
+		self.add_youtube_videos("UUDjGU4DP3b-eGxrsipCvoVQ")
+		self.add_item(_plugin.getuni(30101), thumbnail=(icon,0), url={"action":"Recent", "url":"/video/index.html#page/full-width-list/1", "type":"video"})
+		self.add_item(_plugin.getuni(30102), thumbnail=(icon,0), url={"action":"Recent", "url":"/audio/index.html#page/full-width-list/1", "type":"audio"})
 		
 		# Fetch and Return VideoItems
 		return self.regex_scraper(sourceCode)
@@ -71,8 +71,8 @@ class ContentLister(listitem.VirtualFS):
 	def scraper(self):
 		_plugin = plugin
 		# Add link to Alternitve Listing
-		if _plugin["type"] == u"video-list": self.add_item("-%s" % _plugin.getuni(30103), thumbnail=(_plugin.getIcon(),0), url={"action":"ContentLister", "updatelisting":"true", "url":_plugin["url"], "type":"segment-list"})
-		else: self.add_item("-%s" % _plugin.getuni(30104), thumbnail=(_plugin.getIcon(),0), url={"action":"ContentLister", "updatelisting":"true", "url":_plugin["url"], "type":"video-list"})
+		if _plugin["type"] == u"video-list": self.add_item(_plugin.getuni(30103), thumbnail=(_plugin.getIcon(),0), url={"action":"ContentLister", "updatelisting":"true", "url":_plugin["url"], "type":"segment-list"})
+		else: self.add_item(_plugin.getuni(30104), thumbnail=(_plugin.getIcon(),0), url={"action":"ContentLister", "updatelisting":"true", "url":_plugin["url"], "type":"video-list"})
 		
 		# Fetch Video Content
 		url = BASEURL % _plugin["url"]
