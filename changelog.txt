@@ -1,4 +1,4 @@
-[B]Version 2.0.0[/B] 2015-02-10
+[B]Version 2.0.0[/B] 2015-02-20
 - Fixed bug with no images showing
 - Fixed some small encoding issue
 - Added option to view alternative list from other list
