@@ -67,42 +67,40 @@ def root(plugin):
     yield Listitem.youtube(u"UUDjGU4DP3b-eGxrsipCvoVQ")
 
     # Add Recent Videos link
-    item_dict = {"label": plugin.localize(RECENT_VIDEOS), "formatting": u"[B]%s[/B]", "callback": content_lister,
-                 "params": {"sfid": sfid, "ctype": u"video"}, "art": {"thumb": icon}}
-    yield Listitem.from_dict(item_dict)
-
+    yield Listitem.from_dict({"label": plugin.localize(RECENT_VIDEOS), "formatting": u"[B]%s[/B]",
+                              "callback": content_lister, "art": {"thumb": icon},
+                              "params": {"sfid": sfid, "ctype": u"video"}})
     # Add Recent Audio link
-    item_dict = {"label": plugin.localize(RECENT_AUDIO), "formatting": u"[B]%s[/B]", "callback": content_lister,
-                 "params": {"sfid": sfid, "ctype": u"segment"}, "art": {"thumb": icon}}
-    yield Listitem.from_dict(item_dict)
+    yield Listitem.from_dict({"label": plugin.localize(RECENT_AUDIO), "formatting": u"[B]%s[/B]",
+                              "callback": content_lister, "art": {"thumb": icon},
+                              "params": {"sfid": sfid, "ctype": u"segment"}})
 
 
 @register_route
-def content_lister(plugin, sfid, ctype, topic=None, from_next=False):
+def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
     """
     :type plugin: :class:`codequick.Route`
     :type sfid: unicode
     :type ctype: unicode
     :type topic: unicode
-    :type from_next: bool
+    :type page_count: str
     """
     # Add link to Alternitve Listing
-    if from_next is False and topic:
+    if page_count == 1 and topic:
         params = {"sfid": sfid, "ctype": u"segment" if ctype == u"video" else u"video", "topic": topic}
         label = plugin.localize(LIST_AUDIO) if ctype == u"video" else plugin.localize(LIST_VIDEO)
         item_dict = {"label": label, "callback": content_lister, "params": params, "art": {"thumb": plugin.icon}}
         yield Listitem.from_dict(item_dict)
 
     # Create content url
-    next_page = plugin.params.get("_nextpagecount_", "1")
     if topic:
         url = u"http://www.sciencefriday.com/wp-admin/admin-ajax.php?action=get_results&paged=%(next)s&" \
               u"sfid=%(sfid)s&post_types=%(ctype)s&_sft_topic=%(topic)s" % \
-              {"sfid": sfid, "ctype": ctype, "topic": topic, "next": next_page}
+              {"sfid": sfid, "ctype": ctype, "topic": topic, "next": page_count}
     else:
         url = u"http://www.sciencefriday.com/wp-admin/admin-ajax.php?action=get_results&paged=%(next)s&" \
               u"sfid=%(sfid)s&post_types=%(ctype)s" % \
-              {"sfid": sfid, "ctype": ctype, "next": next_page}
+              {"sfid": sfid, "ctype": ctype, "next": page_count}
 
     # Fetch & parse HTML Source
     root_elem = urlquick.get(url).parse()
@@ -111,7 +109,7 @@ def content_lister(plugin, sfid, ctype, topic=None, from_next=False):
     # Fetch next page
     next_url = root_elem.find("./a[@rel='next']")
     if next_url is not None:
-        yield Listitem.next_page()
+        yield Listitem.next_page(page_count=page_count+1)
 
     # Parse the elements
     for element in root_elem.iterfind(".//article"):
