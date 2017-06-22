@@ -5,7 +5,7 @@
         <import addon="plugin.video.youtube" version="5.1.0"/>
         <import addon="script.module.codequick" version="0.0.1"/>
     </requires>
-    <extension library="addon.py" point="xbmc.python.pluginsource">
+    <extension point="xbmc.python.pluginsource" library="addon.py">
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
@@ -18,9 +18,13 @@
         <forum>http://forum.kodi.tv/showthread.php?tid=200630</forum>
         <source>https://github.com/willforde/plugin.video.science.friday</source>
         <website>http://www.sciencefriday.com</website>
+        <assets>
+            <icon>resources/media/icon.png</icon>
+            <fanart>resources/media/fanart.jpg</fanart>
+            <screenshot>resources/screenshots/screenshot-01.jpg</screenshot>
+            <screenshot>resources/screenshots/screenshot-02.jpg</screenshot>
+            <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
+            <screenshot>resources/screenshots/screenshot-04.jpg</screenshot>
+        </assets>
     </extension>
-    <assets>
-        <icon>icon.png</icon>
-        <fanart>fanart.jpg</fanart>
-    </assets>
 </addon>

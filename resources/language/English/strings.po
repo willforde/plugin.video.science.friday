@@ -30,17 +30,17 @@ msgstr ""
 ###############################
 
 msgctxt "#30101"
-msgid "[B]Recent Videos[/B]"
+msgid "Recent Videos"
 msgstr ""
 
 msgctxt "#30102"
-msgid "[B]Recent Audio[/B]"
+msgid "Recent Audio"
 msgstr ""
 
 msgctxt "#30103"
-msgid "[B]List Audio Items[/B]"
+msgid "List Audio Items"
 msgstr ""
 
 msgctxt "#30104"
-msgid "[B]List Video Items[/B]"
+msgid "List Video Items"
 msgstr ""

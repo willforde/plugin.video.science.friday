@@ -17,103 +17,110 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 # Package Import
-import codequick as plugin
+from codequick import register_route, register_resolver, run, Listitem
+import urlquick
 
-plugin.strings.update(recent_videos=30101, recent_audio=30102, list_audio=30103, list_video=30104)
+# Localized string Constants
+RECENT_VIDEOS = 30101
+RECENT_AUDIO = 30102
+LIST_AUDIO = 30103
+LIST_VIDEO = 30104
+
+# Base url of resource
 BASEURL = u"http://www.sciencefriday.com%s"
 
 
-@plugin.route("/")
-def root():
+@register_route
+def root(plugin):
+    """:type plugin: :class:`codequick.Route`"""
     # Set context parameters based on default view setting
-    if plugin.get_setting("defaultview") == 0:
-        context_label = plugin.localize("list_audio")
-        context_type = "segment"
-        item_type = "video"
+    if plugin.setting["defaultview"] == "0":
+        context_label = plugin.localize(LIST_AUDIO)
+        context_type = u"segment"
+        item_type = u"video"
     else:
-        context_label = plugin.localize("list_video")
-        context_type = "video"
-        item_type = "segment"
+        context_label = plugin.localize(LIST_VIDEO)
+        context_type = u"video"
+        item_type = u"segment"
 
     # Fetch HTML Source
-    url = u"http://www.sciencefriday.com/explore/"
-    html = plugin.requests_session().get(url).text
-    icon = plugin.get_info("icon")
+    url = BASEURL % u"/explore/"
+    html = urlquick.get(url)
+    icon = plugin.icon
 
-    # Parse the content
-    stripper = plugin.utils.ETBuilder(u"form", attrs={u"class": u"searchandfilter"}, wanted_tags=[u"form", u"option"])
-    root_elem = stripper.run(html)
-
-    # Fetch sfid from root element
+    # Parse for the content
+    root_elem = html.parse(u"form", attrs={u"class": u"searchandfilter"})
     sfid = root_elem.get(u"data-sf-form-id")
-    assert sfid, "Unable to find sfid, Cannot proceed without it"
 
     # List all topics
-    for element in root_elem.iterfind(".//option[@data-sf-cr]"):
-        item = plugin.ListItem()
-        item.label = element.text
-
-        # Set url params
-        item.url["topic"] = element.attrib["value"]
-        item.url["type"] = item_type
+    for elem in root_elem.iterfind(".//option[@data-sf-cr]"):
+        item = Listitem()
+        item.set_label(elem.text)
         item.art["thumb"] = icon
-        item.url["sfid"] = sfid
 
         # Add context item to link to the opposite content type. e.g. audio if video is default
-        item.context.add(content_lister, context_label, topic=element.attrib["value"], sfid=sfid, type=context_type)
-
-        # Return tuple of (url, listitem, isfolder)
-        yield item.get(content_lister)
+        item.context.container(context_label, content_lister, topic=elem.attrib["value"], sfid=sfid, ctype=context_type)
+        item.set_callback(content_lister, topic=elem.attrib["value"], ctype=item_type, sfid=sfid)
+        yield item
 
     # Add Youtube & Recent Content
-    yield plugin.ListItem.add_youtube(u"UUDjGU4DP3b-eGxrsipCvoVQ")
-    yield plugin.ListItem.add_item(content_lister, plugin.localize("recent_videos"), thumbnail=icon, sfid=sfid, type="video", topic="")
-    yield plugin.ListItem.add_item(content_lister, plugin.localize("recent_audio"), thumbnail=icon, sfid=sfid, type="segment", topic="")
+    yield Listitem.youtube(u"UUDjGU4DP3b-eGxrsipCvoVQ")
+
+    # Add Recent Videos link
+    item_dict = {"label": plugin.localize(RECENT_VIDEOS), "formatting": u"[B]%s[/B]", "callback": content_lister,
+                 "params": {"sfid": sfid, "ctype": u"video"}, "art": {"thumb": icon}}
+    yield Listitem.from_dict(item_dict)
+
+    # Add Recent Audio link
+    item_dict = {"label": plugin.localize(RECENT_AUDIO), "formatting": u"[B]%s[/B]", "callback": content_lister,
+                 "params": {"sfid": sfid, "ctype": u"segment"}, "art": {"thumb": icon}}
+    yield Listitem.from_dict(item_dict)
 
 
-@plugin.route("/lister")
-def content_lister():
-    # Only add listing for alternate type if not executing as a next page
-    icon = plugin.get_info("icon")
-    if "nextpagecount" not in plugin.params and "topic" in plugin.params:
-        link_params = plugin.params.copy()
-        link_params["updatelisting"] = "true"
-        link_params["type"] = "segment" if link_params["type"] == "video" else "video"
-
-        # Add link to Alternitve Listing
-        if plugin.params["type"] == "video":
-            yield plugin.ListItem.add_item(content_lister, plugin.localize("list_audio"), thumbnail=icon, **link_params)
-        else:
-            yield plugin.ListItem.add_item(content_lister, plugin.localize("list_video"), thumbnail=icon, **link_params)
-
-    # Fetch Quality Setting from Youtube Addon
-    if plugin.params["type"] == u"video":
-        has_hd = plugin.youtube.youtube_hd()
-    else:
-        has_hd = None
+@register_route
+def content_lister(plugin, sfid, ctype, topic=None, from_next=False):
+    """
+    :type plugin: :class:`codequick.Route`
+    :type sfid: unicode
+    :type ctype: unicode
+    :type topic: unicode
+    :type from_next: bool
+    """
+    # Add link to Alternitve Listing
+    if from_next is False and topic:
+        params = {"sfid": sfid, "ctype": u"segment" if ctype == u"video" else u"video", "topic": topic}
+        label = plugin.localize(LIST_AUDIO) if ctype == u"video" else plugin.localize(LIST_VIDEO)
+        item_dict = {"label": label, "callback": content_lister, "params": params, "art": {"thumb": plugin.icon}}
+        yield Listitem.from_dict(item_dict)
 
     # Create content url
-    plugin.params["nextpagecount"] = plugin.params.get("nextpagecount", "1")
-    if "topic" in plugin.params:
-        url = u"http://www.sciencefriday.com/wp-admin/admin-ajax.php?action=get_results&paged=%(nextpagecount)s&" \
-              u"sfid=%(sfid)s&post_types=%(type)s&_sft_topic=%(topic)s" % plugin.params
+    next_page = plugin.params.get("_nextpagecount_", "1")
+    if topic:
+        url = u"http://www.sciencefriday.com/wp-admin/admin-ajax.php?action=get_results&paged=%(next)s&" \
+              u"sfid=%(sfid)s&post_types=%(ctype)s&_sft_topic=%(topic)s" % \
+              {"sfid": sfid, "ctype": ctype, "topic": topic, "next": next_page}
     else:
-        url = u"http://www.sciencefriday.com/wp-admin/admin-ajax.php?action=get_results&paged=%(nextpagecount)s&" \
-              u"sfid=%(sfid)s&post_types=%(type)s" % plugin.params
+        url = u"http://www.sciencefriday.com/wp-admin/admin-ajax.php?action=get_results&paged=%(next)s&" \
+              u"sfid=%(sfid)s&post_types=%(ctype)s" % \
+              {"sfid": sfid, "ctype": ctype, "next": next_page}
 
     # Fetch & parse HTML Source
-    html = plugin.requests_session().get(url).text
-    stripper = plugin.utils.ETBuilder(wanted_tags=[u"article", u"a", u"p", u"img"], root_tag=u"body")
-    root_elem = stripper.run(html)
+    root_elem = urlquick.get(url).parse()
+    icon = plugin.icon
+
+    # Fetch next page
+    next_url = root_elem.find("./a[@rel='next']")
+    if next_url is not None:
+        yield Listitem.next_page()
 
     # Parse the elements
     for element in root_elem.iterfind(".//article"):
         tag_a = element.find("./a[@rel='bookmark']")
-        item = plugin.ListItem()
+        item = Listitem()
         item.label = tag_a.text
-        item.stream.hd(has_hd)
+        # item.stream.hd(has_hd)
 
-        # Fetch plot/duration
+        # Fetch plot & duration
         tag_p = element.findall("p")
         if tag_p and tag_p[0].get("class") == "run-time":
             item.info["duration"] = tag_p[0].text
@@ -128,45 +135,32 @@ def content_lister():
         else:
             item.art["thumb"] = icon
 
-        # Fetch audio/video url and Return listitem
+        # Fetch audio/video url
         tag_audio = element.find("./a[@data-audio]")
         if tag_audio is not None:
             audio_url = tag_audio.get("data-audio")
-            yield item.get(audio_url)
+            item.set_callback(audio_url)
         else:
-            item.url["url"] = tag_a.get("href")
-            yield item.get(play_media)
+            item.params["url"] = tag_a.get("href")
+            item.set_callback(play_media)
 
-    # Fetch next page
-    next_url = root_elem.find("./a[@rel='next']")
-    if next_url is not None:
-        yield plugin.ListItem.add_next()
+        yield item
 
 
-@plugin.resolve("/player")
-def play_media():
-    # Create url for oembed api
-    url = plugin.params["url"]
-    html = plugin.requests_session().get(url).content
-
+@register_resolver
+def play_media(plugin, url):
+    """
+    :type plugin: :class:`codequick.Resolver`
+    :type url: unicode
+    """
     # Run SpeedForce to atempt to strip Out any unneeded html tags
-    flash = plugin.utils.ETBuilder(u"section", attrs={u"class": u"video-section bg-lightgrey"}, wanted_tags=[u"iframe"])
-    root_elem = flash.run(html)
+    root_elem = urlquick.get(url).parse(u"section", attrs={u"class": u"video-section bg-lightgrey"})
 
     # Search for youtube iframe
     iframe = root_elem.find("iframe")
-    assert iframe is not None, "Unable to find youtube iframe, Cannot proceed without it"
-    import urlparse
+    return plugin.extract_source(iframe.get("src"))
 
-    # Check for playlist or video
-    src = urlparse.urlsplit(iframe.get("src"))
-    if src.path == u'/embed/videoseries':
-        playlist_id = urlparse.parse_qs(src.query)["list"]
-        return play_media.youtube_playlist_url(playlist_id)
-    elif src.path.startswith("/embed/"):
-        video_id = src.path.rsplit("/", 1)[-1]
-        return play_media.youtube_video_url(video_id)
 
 # Initiate Startup
 if __name__ == "__main__":
-    plugin.run(True)
+    run()
