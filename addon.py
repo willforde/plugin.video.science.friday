@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
 # Package Import
-from codequick import register_route, register_resolver, run, Listitem
+from codequick import Route, Resolver, run, Listitem
 import urlquick
 
 # Localized string Constants
@@ -30,9 +30,9 @@ LIST_AUDIO = 30103
 LIST_VIDEO = 30104
 
 
-@register_route
+@Route.register
 def root(plugin):
-    """:type plugin: codequick.Route"""
+    """:type plugin: Route"""
     # Set context parameters based on default view setting
     if plugin.setting.get_int("defaultview") == 0:
         context_label = plugin.localize(LIST_AUDIO)
@@ -74,10 +74,10 @@ def root(plugin):
         yield item
 
 
-@register_route
+@Route.register
 def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
     """
-    :type plugin: codequick.Route
+    :type plugin: Route
     :type sfid: unicode
     :type ctype: unicode
     :type topic: unicode
@@ -143,10 +143,10 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
         yield item
 
 
-@register_resolver
+@Resolver.register
 def play_media(plugin, url):
     """
-    :type plugin: codequick.Resolver
+    :type plugin: Resolver
     :type url: unicode
     """
     # Run SpeedForce to atempt to strip Out any unneeded html tags
