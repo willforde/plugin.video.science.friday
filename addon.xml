@@ -2,8 +2,8 @@
 <addon id="plugin.video.science.friday" name="Science Friday" provider-name="willforde" version="3.0.0">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
-        <import addon="plugin.video.youtube" version="5.1.0"/>
         <import addon="script.module.codequick" version="0.0.1"/>
+        <import addon="script.module.youtube.dl" version="15.1223.0"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="addon.py">
         <provides>video</provides>

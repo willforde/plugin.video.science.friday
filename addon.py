@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Copyright: (c) 2016 William Forde (willforde+kodi@gmail.com)
 License: GPLv3, see LICENSE for more details
@@ -15,6 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
+# Standard Library Imports
+from __future__ import unicode_literals
 
 # Package Import
 from codequick import register_route, register_resolver, run, Listitem
@@ -26,36 +29,43 @@ RECENT_AUDIO = 30102
 LIST_AUDIO = 30103
 LIST_VIDEO = 30104
 
-# Base url of resource
-BASEURL = u"http://www.sciencefriday.com%s"
-
 
 @register_route
 def root(plugin):
-    """:type plugin: :class:`codequick.Route`"""
+    """:type plugin: codequick.Route"""
     # Set context parameters based on default view setting
-    if plugin.setting["defaultview"] == "0":
+    if plugin.setting.get_int("defaultview") == 0:
         context_label = plugin.localize(LIST_AUDIO)
-        context_type = u"segment"
-        item_type = u"video"
+        context_type = "segment"
+        item_type = "video"
     else:
         context_label = plugin.localize(LIST_VIDEO)
-        context_type = u"video"
-        item_type = u"segment"
+        context_type = "video"
+        item_type = "segment"
 
     # Fetch HTML Source
-    url = BASEURL % u"/explore/"
+    url = "https://www.sciencefriday.com/explore/"
     html = urlquick.get(url)
     icon = plugin.icon
 
     # Parse for the content
-    root_elem = html.parse(u"form", attrs={u"class": u"searchandfilter"})
-    sfid = root_elem.get(u"data-sf-form-id")
+    root_elem = html.parse("form", attrs={"class": "searchandfilter"})
+    sfid = root_elem.get("data-sf-form-id")
+
+    # Add Youtube & Recent Content
+    yield Listitem.youtube("UUDjGU4DP3b-eGxrsipCvoVQ")
+
+    # Add Recent Videos link
+    yield Listitem.from_dict(label=plugin.localize(RECENT_VIDEOS), callback=content_lister,
+                             art={"thumb": icon}, params={"sfid": sfid, "ctype": "video"})
+    # Add Recent Audio link
+    yield Listitem.from_dict(label=plugin.localize(RECENT_AUDIO), callback=content_lister,
+                             art={"thumb": icon}, params={"sfid": sfid, "ctype": "segment"})
 
     # List all topics
     for elem in root_elem.iterfind(".//option[@data-sf-cr]"):
         item = Listitem()
-        item.set_label(elem.text)
+        item.label = elem.text
         item.art["thumb"] = icon
 
         # Add context item to link to the opposite content type. e.g. audio if video is default
@@ -63,63 +73,52 @@ def root(plugin):
         item.set_callback(content_lister, topic=elem.attrib["value"], ctype=item_type, sfid=sfid)
         yield item
 
-    # Add Youtube & Recent Content
-    yield Listitem.youtube(u"UUDjGU4DP3b-eGxrsipCvoVQ")
-
-    # Add Recent Videos link
-    yield Listitem.from_dict({"label": plugin.localize(RECENT_VIDEOS), "formatting": u"[B]%s[/B]",
-                              "callback": content_lister, "art": {"thumb": icon},
-                              "params": {"sfid": sfid, "ctype": u"video"}})
-    # Add Recent Audio link
-    yield Listitem.from_dict({"label": plugin.localize(RECENT_AUDIO), "formatting": u"[B]%s[/B]",
-                              "callback": content_lister, "art": {"thumb": icon},
-                              "params": {"sfid": sfid, "ctype": u"segment"}})
-
 
 @register_route
 def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
     """
-    :type plugin: :class:`codequick.Route`
+    :type plugin: codequick.Route
     :type sfid: unicode
     :type ctype: unicode
     :type topic: unicode
-    :type page_count: str
+    :type page_count: int
     """
     # Add link to Alternitve Listing
     if page_count == 1 and topic:
         params = {"sfid": sfid, "ctype": u"segment" if ctype == u"video" else u"video", "topic": topic}
         label = plugin.localize(LIST_AUDIO) if ctype == u"video" else plugin.localize(LIST_VIDEO)
         item_dict = {"label": label, "callback": content_lister, "params": params, "art": {"thumb": plugin.icon}}
-        yield Listitem.from_dict(item_dict)
+        yield Listitem.from_dict(**item_dict)
 
     # Create content url
     if topic:
-        url = u"http://www.sciencefriday.com/wp-admin/admin-ajax.php?action=get_results&paged=%(next)s&" \
-              u"sfid=%(sfid)s&post_types=%(ctype)s&_sft_topic=%(topic)s" % \
+        url = "https://www.sciencefriday.com/wp-admin/admin-ajax.php?action=get_results&paged=%(next)s&" \
+              "sfid=%(sfid)s&post_types=%(ctype)s&_sft_topic=%(topic)s" % \
               {"sfid": sfid, "ctype": ctype, "topic": topic, "next": page_count}
     else:
-        url = u"http://www.sciencefriday.com/wp-admin/admin-ajax.php?action=get_results&paged=%(next)s&" \
-              u"sfid=%(sfid)s&post_types=%(ctype)s" % \
+        url = "https://www.sciencefriday.com/wp-admin/admin-ajax.php?action=get_results&paged=%(next)s&" \
+              "sfid=%(sfid)s&post_types=%(ctype)s" % \
               {"sfid": sfid, "ctype": ctype, "next": page_count}
 
     # Fetch & parse HTML Source
+    ishd = bool(plugin.setting.get_int("video_quality", addon_id="script.module.youtube.dl"))
     root_elem = urlquick.get(url).parse()
     icon = plugin.icon
 
     # Fetch next page
-    next_url = root_elem.find("./a[@rel='next']")
+    next_url = root_elem.find(".//a[@rel='next']")
     if next_url is not None:
         yield Listitem.next_page(page_count=page_count+1)
 
     # Parse the elements
     for element in root_elem.iterfind(".//article"):
-        tag_a = element.find("./a[@rel='bookmark']")
+        tag_a = element.find(".//a[@rel='bookmark']")
         item = Listitem()
         item.label = tag_a.text
-        # item.stream.hd(has_hd)
+        item.stream.hd(ishd)
 
         # Fetch plot & duration
-        tag_p = element.findall("p")
+        tag_p = element.findall(".//p")
         if tag_p and tag_p[0].get("class") == "run-time":
             item.info["duration"] = tag_p[0].text
             item.info["plot"] = tag_p[1].text
@@ -139,8 +138,7 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
             audio_url = tag_audio.get("data-audio")
             item.set_callback(audio_url)
         else:
-            item.params["url"] = tag_a.get("href")
-            item.set_callback(play_media)
+            item.set_callback(play_media, url=tag_a.get("href"))
 
         yield item
 
@@ -148,17 +146,17 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
 @register_resolver
 def play_media(plugin, url):
     """
-    :type plugin: :class:`codequick.Resolver`
+    :type plugin: codequick.Resolver
     :type url: unicode
     """
     # Run SpeedForce to atempt to strip Out any unneeded html tags
-    root_elem = urlquick.get(url).parse(u"section", attrs={u"class": u"video-section bg-lightgrey"})
+    root_elem = urlquick.get(url).parse("section", attrs={"class": "video-section bg-lightgrey"})
 
     # Search for youtube iframe
-    iframe = root_elem.find("iframe")
+    iframe = root_elem.find("./div/iframe")
     return plugin.extract_source(iframe.get("src"))
 
 
-# Initiate Startup
+# Initiate add-on
 if __name__ == "__main__":
     run()
