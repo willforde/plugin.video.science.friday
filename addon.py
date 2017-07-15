@@ -19,8 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 # Standard Library Imports
 from __future__ import unicode_literals
 
-# Package Import
-from codequick import Route, Resolver, run, Listitem
+# Package Imports
+from codequick import Route, Resolver, Listitem, run
 import urlquick
 
 # Localized string Constants
@@ -138,13 +138,13 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
             audio_url = tag_audio.get("data-audio")
             item.set_callback(audio_url)
         else:
-            item.set_callback(play_media, url=tag_a.get("href"))
+            item.set_callback(play_video, url=tag_a.get("href"))
 
         yield item
 
 
 @Resolver.register
-def play_media(plugin, url):
+def play_video(plugin, url):
     """
     :type plugin: Resolver
     :type url: unicode
