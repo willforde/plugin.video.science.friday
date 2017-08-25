@@ -1,33 +1,28 @@
 # -*- coding: utf-8 -*-
-"""
-Copyright: (c) 2016 William Forde (willforde+kodi@gmail.com)
-License: GPLv3, see LICENSE for more details
+# Copyright: (c) 2016 William Forde (willforde+kodi@gmail.com)
+# License: GPLv3, see LICENSE for more details
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-"""
-# Standard Library Imports
 from __future__ import unicode_literals
-
-# Package Imports
 from codequick import Route, Resolver, Listitem, run
-import urlquick
 
 # Localized string Constants
-RECENT_VIDEOS = 30101
-RECENT_AUDIO = 30102
-LIST_AUDIO = 30103
-LIST_VIDEO = 30104
+RECENT_VIDEOS = 30001
+RECENT_AUDIO = 30002
+LIST_AUDIO = 30003
+LIST_VIDEO = 30004
 
 
 @Route.register
@@ -45,8 +40,7 @@ def root(plugin):
 
     # Fetch HTML Source
     url = "https://www.sciencefriday.com/explore/"
-    html = urlquick.get(url)
-    icon = plugin.icon
+    html = plugin.request.get(url)
 
     # Parse for the content
     root_elem = html.parse("form", attrs={"class": "searchandfilter"})
@@ -57,16 +51,15 @@ def root(plugin):
 
     # Add Recent Videos link
     yield Listitem.from_dict(label=plugin.localize(RECENT_VIDEOS), callback=content_lister,
-                             art={"thumb": icon}, params={"sfid": sfid, "ctype": "video"})
+                             params={"sfid": sfid, "ctype": "video"})
     # Add Recent Audio link
     yield Listitem.from_dict(label=plugin.localize(RECENT_AUDIO), callback=content_lister,
-                             art={"thumb": icon}, params={"sfid": sfid, "ctype": "segment"})
+                             params={"sfid": sfid, "ctype": "segment"})
 
     # List all topics
     for elem in root_elem.iterfind(".//option[@data-sf-cr]"):
         item = Listitem()
         item.label = elem.text
-        item.art["thumb"] = icon
 
         # Add context item to link to the opposite content type. e.g. audio if video is default
         item.context.container(context_label, content_lister, topic=elem.attrib["value"], sfid=sfid, ctype=context_type)
@@ -87,7 +80,7 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
     if page_count == 1 and topic:
         params = {"sfid": sfid, "ctype": u"segment" if ctype == u"video" else u"video", "topic": topic}
         label = plugin.localize(LIST_AUDIO) if ctype == u"video" else plugin.localize(LIST_VIDEO)
-        item_dict = {"label": label, "callback": content_lister, "params": params, "art": {"thumb": plugin.icon}}
+        item_dict = {"label": label, "callback": content_lister, "params": params}
         yield Listitem.from_dict(**item_dict)
 
     # Create content url
@@ -102,13 +95,12 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
 
     # Fetch & parse HTML Source
     ishd = bool(plugin.setting.get_int("video_quality", addon_id="script.module.youtube.dl"))
-    root_elem = urlquick.get(url).parse()
-    icon = plugin.icon
+    root_elem = plugin.request.get(url).parse()
 
     # Fetch next page
     next_url = root_elem.find(".//a[@rel='next']")
     if next_url is not None:
-        yield Listitem.next_page(page_count=page_count+1)
+        yield Listitem.next_page(sfid=sfid, ctype=ctype, page_count=page_count+1)
 
     # Parse the elements
     for element in root_elem.iterfind(".//article"):
@@ -129,8 +121,6 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
         img = element.find(".//img[@data-src]")
         if img is not None:
             item.art["thumb"] = img.get("data-src")
-        else:
-            item.art["thumb"] = icon
 
         # Fetch audio/video url
         tag_audio = element.find("./a[@data-audio]")
@@ -150,7 +140,7 @@ def play_video(plugin, url):
     :type url: unicode
     """
     # Run SpeedForce to atempt to strip Out any unneeded html tags
-    root_elem = urlquick.get(url).parse("section", attrs={"class": "video-section bg-lightgrey"})
+    root_elem = plugin.request.get(url).parse("section", attrs={"class": "video-section bg-lightgrey"})
 
     # Search for youtube iframe
     iframe = root_elem.find("./div/iframe")
