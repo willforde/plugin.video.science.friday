@@ -1,8 +1,8 @@
 .. image:: https://api.codacy.com/project/badge/Grade/90d91c76170b4c2c962cbb46c62dff12
     :target: https://www.codacy.com/app/willforde/plugin.video.science.friday?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=willforde/plugin.video.science.friday&amp;utm_campaign=Badge_Grade
 
-Earth Touch
-===========
+Science Friday
+==============
 .. image:: resources/icon.png
 
 This is a kodi video add-on for Science Friday science videos.
