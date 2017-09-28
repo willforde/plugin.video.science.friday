@@ -125,7 +125,7 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
             item.art["thumb"] = img.get("data-src")
 
         # Fetch audio/video url
-        tag_audio = element.find("./a[@data-audio]")
+        tag_audio = element.find(".//a[@data-audio]")
         if tag_audio is not None:
             audio_url = tag_audio.get("data-audio")
             item.set_callback(audio_url)
