@@ -12,7 +12,7 @@ Started as a radio show, created in 1991 by host and executive producer Ira Flat
 weve grown into much more: We produce award-winning digital videos and publish original web content
 covering everything from octopus camouflage to cooking on Mars. SciFri is brain fun, for curious people.
 
-The add-on is available in the official kodi repository and is available on kodi v17 "Krypton" and greater.
+The add-on is available in the official kodi repository for kodi v17 "Krypton" and greater.
 
 .. image:: resources/screenshots/screenshot000.jpg
 .. image:: resources/screenshots/screenshot001.jpg
