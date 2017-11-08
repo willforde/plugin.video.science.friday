@@ -1,3 +1,9 @@
+.. image:: https://travis-ci.org/willforde/plugin.video.science.friday.svg?branch=master
+    :target: https://travis-ci.org/willforde/plugin.video.science.friday
+
+.. image:: https://coveralls.io/repos/github/willforde/plugin.video.science.friday/badge.svg?branch=master
+    :target: https://coveralls.io/github/willforde/plugin.video.science.friday?branch=master
+
 .. image:: https://api.codacy.com/project/badge/Grade/90d91c76170b4c2c962cbb46c62dff12
     :target: https://www.codacy.com/app/willforde/plugin.video.science.friday?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=willforde/plugin.video.science.friday&amp;utm_campaign=Badge_Grade
 
