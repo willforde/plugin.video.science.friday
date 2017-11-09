@@ -49,7 +49,7 @@ def root(plugin):
     sfid = root_elem.get("data-sf-form-id")
 
     # Add Youtube & Recent Content
-    yield Listitem.youtube("UUDjGU4DP3b-eGxrsipCvoVQ")
+    yield Listitem.youtube("UCDjGU4DP3b-eGxrsipCvoVQ")
 
     # Add Recent Videos link
     yield Listitem.from_dict(label=plugin.localize(RECENT_VIDEOS), callback=content_lister,
