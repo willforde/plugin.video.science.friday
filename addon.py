@@ -101,7 +101,7 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
 
     # Fetch next page
     next_url = root_elem.find(".//a[@rel='next']")
-    if next_url is not None:
+    if next_url is not None:  # pragma: no branch
         yield Listitem.next_page(sfid=sfid, ctype=ctype, page_count=page_count+1)
 
     # Parse the elements
@@ -116,7 +116,7 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
         if tag_p and tag_p[0].get("class") == "run-time":
             item.info["duration"] = tag_p[0].text
             item.info["plot"] = tag_p[1].text
-        elif tag_p:
+        elif tag_p:  # pragma: no branch
             item.info["plot"] = tag_p[0].text
 
         # Fetch image if exists
@@ -138,6 +138,8 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
 @Resolver.register
 def play_video(plugin, url):
     """
+    Site: https://www.sciencefriday.com/videos/reverse-engineering-europa/?post_types=video&_sft_topic=space
+
     :type plugin: Resolver
     :type url: unicode
     """
@@ -145,8 +147,7 @@ def play_video(plugin, url):
     root_elem = plugin.request.get(url).parse("section", attrs={"class": "video-section bg-lightgrey"})
 
     # Search for youtube iframe
-    iframe = root_elem.find("./div/iframe")
-    return plugin.extract_source(iframe.get("src"))
+    return plugin.extract_youtube(root_elem)
 
 
 # Initiate add-on

@@ -1,15 +1,19 @@
-from addondev import initializer
-import os
-
-initializer(os.path.dirname(os.path.dirname(__file__)))
+from addondev import testing
 import unittest
-import addon
+
+# Testing specific imports
 from codequick import youtube
+import addon
 
 
 class Tester(unittest.TestCase):
     def test_root(self):
         data = addon.root.test()
+        self.assertGreaterEqual(len(data), 16)
+
+    def test_root_audio(self):
+        with testing.mock_setting("defaultview", 1):
+            data = addon.root.test()
         self.assertGreaterEqual(len(data), 16)
 
     def test_youtube_channel(self):
@@ -47,3 +51,8 @@ class Tester(unittest.TestCase):
     def test_content_lister_audio_next(self):
         data = addon.content_lister.test(sfid=1183, ctype="segment", topic="space", page_count=2)
         self.assertGreaterEqual(len(data), 10)
+
+    def test_play_video(self):
+        ret = addon.play_video.test(u"https://www.sciencefriday.com/videos/reverse-engineering-europa"
+                                    u"/?post_types=video&_sft_topic=space")
+        self.assertEqual(ret, u"plugin://plugin.video.youtube/play/?video_id=HK5qnpDClRI")
