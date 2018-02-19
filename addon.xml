@@ -25,6 +25,6 @@
             <screenshot>resources/screenshots/screenshot001.jpg</screenshot>
             <screenshot>resources/screenshots/screenshot002.jpg</screenshot>
         </assets>
-        <news>[fix] Fixed playback problem with kodi on xbox.</news>
+        <news>[fix] Fixed playback problem with Kodi on Xbox.</news>
     </extension>
 </addon>

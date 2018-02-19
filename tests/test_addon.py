@@ -6,8 +6,8 @@ from codequick import youtube
 import codequick
 import addon
 
-# Check if we are runing the dev version of codequick
-dev_version = codequick.__dict__.get("__version__", (0, 9, 0)) >= (0, 9, 2)
+# Check witch version of codequick we are running
+framework_version = codequick.__dict__.get("__version__", (0, 9, 0))
 
 
 class Tester(unittest.TestCase):
@@ -56,7 +56,7 @@ class Tester(unittest.TestCase):
         data = addon.content_lister.test(sfid=1183, ctype="segment", topic="space", page_count=2)
         self.assertGreaterEqual(len(data), 10)
 
-    @unittest.skipUnless(dev_version, "Only work on the dev version of codequick")
+    @unittest.skipUnless(framework_version >= (0, 9, 2), "Only work on v0.9.2 and up of codequick")
     def test_play_video(self):
         ret = addon.play_video.test(u"https://www.sciencefriday.com/videos/reverse-engineering-europa"
                                     u"/?post_types=video&_sft_topic=space")
