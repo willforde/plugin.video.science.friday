@@ -19,6 +19,7 @@
 
 from __future__ import unicode_literals
 from codequick import Route, Resolver, Listitem, run
+import urlquick
 
 # Localized string Constants
 RECENT_VIDEOS = 30001
@@ -42,7 +43,7 @@ def root(plugin):
 
     # Fetch HTML Source
     url = "https://www.sciencefriday.com/explore/"
-    html = plugin.request.get(url)
+    html = urlquick.get(url)
 
     # Parse for the content
     root_elem = html.parse("form", attrs={"class": "searchandfilter"})
@@ -97,7 +98,7 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
 
     # Fetch & parse HTML Source
     ishd = bool(plugin.setting.get_int("video_quality", addon_id="script.module.youtube.dl"))
-    root_elem = plugin.request.get(url).parse()
+    root_elem = urlquick.get(url).parse()
 
     # Fetch next page
     next_url = root_elem.find(".//a[@rel='next']")
@@ -144,7 +145,7 @@ def play_video(plugin, url):
     :type url: unicode
     """
     # Run SpeedForce to atempt to strip Out any unneeded html tags
-    root_elem = plugin.request.get(url).parse("section", attrs={"class": "video-section bg-lightgrey"})
+    root_elem = urlquick.get(url).parse("section", attrs={"class": "video-section bg-lightgrey"})
 
     # Search for youtube iframe
     return plugin.extract_youtube(root_elem)
