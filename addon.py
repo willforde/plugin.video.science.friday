@@ -53,10 +53,10 @@ def root(plugin):
     yield Listitem.youtube("UCDjGU4DP3b-eGxrsipCvoVQ")
 
     # Add Recent Videos link
-    yield Listitem.from_dict(label=plugin.localize(RECENT_VIDEOS), callback=content_lister,
+    yield Listitem.from_dict(content_lister, plugin.localize(RECENT_VIDEOS),
                              params={"sfid": sfid, "ctype": "video"})
     # Add Recent Audio link
-    yield Listitem.from_dict(label=plugin.localize(RECENT_AUDIO), callback=content_lister,
+    yield Listitem.from_dict(content_lister, plugin.localize(RECENT_AUDIO),
                              params={"sfid": sfid, "ctype": "segment"})
 
     # List all topics
