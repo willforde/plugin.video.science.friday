@@ -144,11 +144,7 @@ def play_video(plugin, url):
     :type plugin: Resolver
     :type url: unicode
     """
-    # Run SpeedForce to atempt to strip Out any unneeded html tags
-    root_elem = urlquick.get(url).parse("section", attrs={"class": "video-section bg-lightgrey"})
-
-    # Search for youtube iframe
-    return plugin.extract_youtube(root_elem)
+    return plugin.extract_source(url)
 
 
 # Initiate add-on
