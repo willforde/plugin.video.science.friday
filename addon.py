@@ -65,7 +65,7 @@ def root(plugin):
         item.label = elem.text
 
         # Add context item to link to the opposite content type. e.g. audio if video is default
-        item.context.container(context_label, content_lister, topic=elem.attrib["value"], sfid=sfid, ctype=context_type)
+        item.context.container(content_lister, context_label, topic=elem.attrib["value"], sfid=sfid, ctype=context_type)
         item.set_callback(content_lister, topic=elem.attrib["value"], ctype=item_type, sfid=sfid)
         yield item
 
