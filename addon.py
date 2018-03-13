@@ -81,7 +81,8 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
     """
     # Add link to Alternitve Listing
     if page_count == 1 and topic:
-        params = {"sfid": sfid, "ctype": u"segment" if ctype == u"video" else u"video", "topic": topic}
+        params = {"_updatelisting_": True, "sfid": sfid, "topic": topic,
+                  "ctype": u"segment" if ctype == u"video" else u"video"}
         label = plugin.localize(LIST_AUDIO) if ctype == u"video" else plugin.localize(LIST_VIDEO)
         item_dict = {"label": label, "callback": content_lister, "params": params}
         yield Listitem.from_dict(**item_dict)
