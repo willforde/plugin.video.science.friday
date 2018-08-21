@@ -33,11 +33,11 @@ def root(plugin):
     """:type plugin: Route"""
     # Set context parameters based on default view setting
     if plugin.setting.get_int("defaultview") == 0:
-        context_label = plugin.localize(LIST_AUDIO)
+        context_label = "[B]{}[/B]".format(plugin.localize(LIST_AUDIO))
         context_type = "segment"
         item_type = "video"
     else:
-        context_label = plugin.localize(LIST_VIDEO)
+        context_label = "[B]{}[/B]".format(plugin.localize(LIST_VIDEO))
         context_type = "video"
         item_type = "segment"
 
@@ -53,10 +53,10 @@ def root(plugin):
     yield Listitem.youtube("UCDjGU4DP3b-eGxrsipCvoVQ")
 
     # Add Recent Videos link
-    yield Listitem.from_dict(content_lister, plugin.localize(RECENT_VIDEOS),
+    yield Listitem.from_dict(content_lister, "[B]{}[/B]".format(plugin.localize(RECENT_VIDEOS)),
                              params={"sfid": sfid, "ctype": "video"})
     # Add Recent Audio link
-    yield Listitem.from_dict(content_lister, plugin.localize(RECENT_AUDIO),
+    yield Listitem.from_dict(content_lister, "[B]{}[/B]".format(plugin.localize(RECENT_AUDIO)),
                              params={"sfid": sfid, "ctype": "segment"})
 
     # List all topics
@@ -83,7 +83,7 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
     if page_count == 1 and topic:
         params = {"_updatelisting_": True, "sfid": sfid, "topic": topic,
                   "ctype": u"segment" if ctype == u"video" else u"video"}
-        label = plugin.localize(LIST_AUDIO) if ctype == u"video" else plugin.localize(LIST_VIDEO)
+        label = "[B]{}[/B]".format(plugin.localize(LIST_AUDIO) if ctype == u"video" else plugin.localize(LIST_VIDEO))
         item_dict = {"label": label, "callback": content_lister, "params": params}
         yield Listitem.from_dict(**item_dict)
 
