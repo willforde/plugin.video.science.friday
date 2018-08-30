@@ -9,7 +9,7 @@
 
 Science Friday
 ==============
-.. image:: resources/icon.png
+.. image:: plugin.video.science.friday/resources/icon.png
 
 This is a kodi video add-on for Science Friday science videos.
 
@@ -22,8 +22,8 @@ Download
 --------
 The add-on is available in the official kodi repository for kodi v17 "Krypton" and later.
 
-.. image:: resources/screenshots/screenshot000.jpg
-.. image:: resources/screenshots/screenshot001.jpg
-.. image:: resources/screenshots/screenshot002.jpg
+.. image:: plugin.video.science.friday/resources/screenshots/screenshot000.jpg
+.. image:: plugin.video.science.friday/resources/screenshots/screenshot001.jpg
+.. image:: plugin.video.science.friday/resources/screenshots/screenshot002.jpg
 
 **Automated Tests:** https://travis-ci.org/willforde/plugin.video.science.friday

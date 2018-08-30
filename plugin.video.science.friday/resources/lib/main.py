@@ -1,23 +1,7 @@
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2016 William Forde (willforde+kodi@gmail.com)
-#
-# License: GPLv2, see LICENSE for more details
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 from __future__ import unicode_literals
+
+# noinspection PyUnresolvedReferences
 from codequick import Route, Resolver, Listitem, run
 import urlquick
 
@@ -28,16 +12,20 @@ LIST_AUDIO = 30003
 LIST_VIDEO = 30004
 
 
+def bold(text):  # type: (str) -> str
+    return "[B]{}[/B]".format(text)
+
+
 @Route.register
 def root(plugin):
     """:type plugin: Route"""
     # Set context parameters based on default view setting
     if plugin.setting.get_int("defaultview") == 0:
-        context_label = "[B]{}[/B]".format(plugin.localize(LIST_AUDIO))
+        context_label = bold(plugin.localize(LIST_AUDIO))
         context_type = "segment"
         item_type = "video"
     else:
-        context_label = "[B]{}[/B]".format(plugin.localize(LIST_VIDEO))
+        context_label = bold(plugin.localize(LIST_VIDEO))
         context_type = "video"
         item_type = "segment"
 
@@ -53,10 +41,10 @@ def root(plugin):
     yield Listitem.youtube("UCDjGU4DP3b-eGxrsipCvoVQ")
 
     # Add Recent Videos link
-    yield Listitem.from_dict(content_lister, "[B]{}[/B]".format(plugin.localize(RECENT_VIDEOS)),
+    yield Listitem.from_dict(content_lister, bold(plugin.localize(RECENT_VIDEOS)),
                              params={"sfid": sfid, "ctype": "video"})
     # Add Recent Audio link
-    yield Listitem.from_dict(content_lister, "[B]{}[/B]".format(plugin.localize(RECENT_AUDIO)),
+    yield Listitem.from_dict(content_lister, bold(plugin.localize(RECENT_AUDIO)),
                              params={"sfid": sfid, "ctype": "segment"})
 
     # List all topics
@@ -83,7 +71,7 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
     if page_count == 1 and topic:
         params = {"_updatelisting_": True, "sfid": sfid, "topic": topic,
                   "ctype": u"segment" if ctype == u"video" else u"video"}
-        label = "[B]{}[/B]".format(plugin.localize(LIST_AUDIO) if ctype == u"video" else plugin.localize(LIST_VIDEO))
+        label = bold(plugin.localize(LIST_AUDIO) if ctype == u"video" else plugin.localize(LIST_VIDEO))
         item_dict = {"label": label, "callback": content_lister, "params": params}
         yield Listitem.from_dict(**item_dict)
 
@@ -146,8 +134,3 @@ def play_video(plugin, url):
     :type url: unicode
     """
     return plugin.extract_source(url)
-
-
-# Initiate add-on
-if __name__ == "__main__":
-    run()

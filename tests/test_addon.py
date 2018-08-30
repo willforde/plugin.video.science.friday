@@ -4,7 +4,7 @@ import unittest
 # Testing specific imports
 from codequick import youtube
 import codequick
-import addon
+from addon import main as addon
 
 # Check witch version of codequick we are running
 framework_version = codequick.__dict__.get("__version__", (0, 9, 0))
