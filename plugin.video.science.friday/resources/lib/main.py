@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 # noinspection PyUnresolvedReferences
 from codequick import Route, Resolver, Listitem, run
+from codequick.utils import bold
 import urlquick
 
 # Localized string Constants
@@ -10,10 +11,6 @@ RECENT_VIDEOS = 30001
 RECENT_AUDIO = 30002
 LIST_AUDIO = 30003
 LIST_VIDEO = 30004
-
-
-def bold(text):  # type: (str) -> str
-    return "[B]{}[/B]".format(text)
 
 
 @Route.register
