@@ -21,11 +21,11 @@ def root(plugin):
     """:type plugin: Route"""
     # Set context parameters based on default view setting
     if plugin.setting.get_int("defaultview") == 0:
-        context_label = bold(plugin.localize(LIST_AUDIO))
+        context_label = plugin.localize(LIST_AUDIO)
         context_type = "segment"
         item_type = "video"
     else:
-        context_label = bold(plugin.localize(LIST_VIDEO))
+        context_label = plugin.localize(LIST_VIDEO)
         context_type = "video"
         item_type = "segment"
 
