@@ -27,3 +27,5 @@ The add-on is available in the official kodi repository for kodi v17 "Krypton" a
 .. image:: plugin.video.science.friday/resources/screenshots/screenshot002.jpg
 
 **Automated Tests:** https://travis-ci.org/willforde/plugin.video.science.friday
+
+**Kodi Forum:** https://forum.kodi.tv/showthread.php?tid=200630&pid=1759195#pid1759195
