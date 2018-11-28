@@ -24,7 +24,7 @@
             <screenshot>resources/screenshots/screenshot001.jpg</screenshot>
             <screenshot>resources/screenshots/screenshot002.jpg</screenshot>
         </assets>
-        <news>[fix] Fixed playback problem with Kodi on Xbox.</news>
+        <news>[upd] Add support for reuse of language invoker. [upd] Some small tweaks.</news>
         <reuselanguageinvoker>true</reuselanguageinvoker>
     </extension>
 </addon>
