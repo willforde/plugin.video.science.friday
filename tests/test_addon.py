@@ -25,39 +25,47 @@ class Tester(unittest.TestCase):
         self.assertGreaterEqual(len(data), 50)
 
     def test_recent_videos(self):
-        data = addon.content_lister.test(sfid=1183, ctype="video")
+        data = addon.content_lister.test(url="/explore/?post_types=video")
         self.assertGreaterEqual(len(data), 10)
 
     def test_recent_videos_next(self):
-        data = addon.content_lister.test(sfid=1183, ctype="video", page_count=2)
+        data = addon.content_lister.test(url="/explore/?post_types=video&sf_paged=2")
         self.assertGreaterEqual(len(data), 10)
 
-    def test_revent_audio(self):
-        data = addon.content_lister.test(sfid=1183, ctype="segment")
+    def test_recent_audio(self):
+        data = addon.content_lister.test(url="/explore/?post_types=segment")
         self.assertGreaterEqual(len(data), 10)
 
-    def test_revent_audio_next(self):
-        data = addon.content_lister.test(sfid=1183, ctype="segment", page_count=2)
+    def test_recent_audio_next(self):
+        data = addon.content_lister.test(url="/explore/?post_types=segment&sf_paged=2")
         self.assertGreaterEqual(len(data), 10)
 
     def test_content_lister_video(self):
-        data = addon.content_lister.test(sfid=1183, ctype="video", topic="space")
+        data = addon.content_lister.test(url="/explore/?post_types=video&_sft_topic=space")
+        self.assertGreaterEqual(len(data), 10)
+
+    def test_content_lister_video_alt(self):
+        data = addon.content_lister.test(
+            url="/explore/?post_types=video&_sft_topic=space",
+            alt_url="/explore/?post_types=segment&_sft_topic=space"
+        )
         self.assertGreaterEqual(len(data), 10)
 
     def test_content_lister_video_next(self):
-        data = addon.content_lister.test(sfid=1183, ctype="video", topic="space", page_count=2)
+        data = addon.content_lister.test(url="/explore/?post_types=video&_sft_topic=space&sf_paged=2")
         self.assertGreaterEqual(len(data), 10)
 
     def test_content_lister_audio(self):
-        data = addon.content_lister.test(sfid=1183, ctype="segment", topic="space")
+        data = addon.content_lister.test(url="/explore/?post_types=segment&_sft_topic=space")
+        self.assertGreaterEqual(len(data), 10)
+
+    def test_content_lister_audio_alt(self):
+        data = addon.content_lister.test(
+            url="/explore/?post_types=segment&_sft_topic=space",
+            alt_url="/explore/?post_types=video&_sft_topic=space"
+        )
         self.assertGreaterEqual(len(data), 10)
 
     def test_content_lister_audio_next(self):
-        data = addon.content_lister.test(sfid=1183, ctype="segment", topic="space", page_count=2)
+        data = addon.content_lister.test(url="/explore/?post_types=segment&_sft_topic=space&sf_paged=2")
         self.assertGreaterEqual(len(data), 10)
-
-    @unittest.skip
-    def test_play_video(self):
-        ret = addon.play_video.test(u"https://www.sciencefriday.com/videos/reverse-engineering-europa"
-                                    u"/?post_types=video&_sft_topic=space")
-        self.assertEqual(ret, u"plugin://plugin.video.youtube/play/?video_id=HK5qnpDClRI")

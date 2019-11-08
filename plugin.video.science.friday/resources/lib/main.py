@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 # noinspection PyUnresolvedReferences
 from codequick import Route, Resolver, Listitem, run
-from codequick.utils import bold
+from codequick.utils import urljoin_partial, bold
 import urlquick
 
 # Localized string Constants
@@ -12,12 +12,18 @@ RECENT_AUDIO = 30002
 LIST_AUDIO = 30003
 LIST_VIDEO = 30004
 
+BASE_URL = "https://www.sciencefriday.com"
+url_constructor = urljoin_partial(BASE_URL)
+
 
 @Route.register
-def root(plugin):
-    """:type plugin: Route"""
+def root(plugin, content_type="video"):
+    """
+    :type plugin: Route
+    :type content_type: str
+    """
     # Set context parameters based on default view setting
-    if plugin.setting.get_int("defaultview") == 0:
+    if content_type == "video":
         context_label = plugin.localize(LIST_AUDIO)
         context_type = "segment"
         item_type = "video"
@@ -26,73 +32,77 @@ def root(plugin):
         context_type = "video"
         item_type = "segment"
 
+    # Add Youtube
+    yield Listitem.youtube("UCDjGU4DP3b-eGxrsipCvoVQ")
+
+    # Recent Content
+    extra_url = url_constructor("/explore/?post_types={}")
+    yield Listitem.from_dict(
+        content_lister,
+        bold(plugin.localize(RECENT_VIDEOS)),
+        params={"url": extra_url.format("video")}
+    )
+    yield Listitem.from_dict(
+        content_lister,
+        bold(plugin.localize(RECENT_AUDIO)),
+        params={"url": extra_url.format("segment")}
+    )
+
     # Fetch HTML Source
-    url = "https://www.sciencefriday.com/explore/"
+    url = url_constructor("/explore/")
     html = urlquick.get(url)
 
     # Parse for the content
     root_elem = html.parse("form", attrs={"class": "searchandfilter"})
-    sfid = root_elem.get("data-sf-form-id")
-
-    # Add Youtube & Recent Content
-    yield Listitem.youtube("UCDjGU4DP3b-eGxrsipCvoVQ")
-
-    # Add Recent Videos link
-    yield Listitem.from_dict(content_lister, bold(plugin.localize(RECENT_VIDEOS)),
-                             params={"sfid": sfid, "ctype": "video"})
-    # Add Recent Audio link
-    yield Listitem.from_dict(content_lister, bold(plugin.localize(RECENT_AUDIO)),
-                             params={"sfid": sfid, "ctype": "segment"})
+    content_url = url_constructor("/explore/?post_types={post_type}&_sft_topic={topic}")
 
     # List all topics
-    for elem in root_elem.iterfind(".//option[@data-sf-cr]"):
+    for elem in root_elem.iterfind(".//option[@data-sf-count]"):
+        count = int(elem.get("data-sf-count"))
+        if not count:
+            continue
+
         item = Listitem()
-        item.label = elem.text
+        item.label = elem.text  # "{} ({})".format(elem.text, count)
+        url = content_url.format(topic=elem.attrib["value"], post_type=item_type)
+        context_url = content_url.format(topic=elem.attrib["value"], post_type=context_type)
 
         # Add context item to link to the opposite content type. e.g. audio if video is default
-        item.context.container(content_lister, context_label, topic=elem.attrib["value"], sfid=sfid, ctype=context_type)
-        item.set_callback(content_lister, topic=elem.attrib["value"], ctype=item_type, sfid=sfid)
+        item.context.container(content_lister, context_label, url=context_url)
+        item.set_callback(content_lister, url=url, alt_url=context_url)
         yield item
 
 
 @Route.register
-def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
+def content_lister(plugin, url, alt_url=None):
     """
     :type plugin: Route
-    :type sfid: unicode
-    :type ctype: unicode
-    :type topic: unicode
-    :type page_count: int
+    :type url: str
+    :type alt_url: str
     """
-    # Add link to Alternitve Listing
-    if page_count == 1 and topic:
-        params = {"_updatelisting_": True, "sfid": sfid, "topic": topic,
-                  "ctype": u"segment" if ctype == u"video" else u"video"}
-        label = bold(plugin.localize(LIST_AUDIO) if ctype == u"video" else plugin.localize(LIST_VIDEO))
-        item_dict = {"label": label, "callback": content_lister, "params": params}
-        yield Listitem.from_dict(**item_dict)
 
-    # Create content url
-    if topic:
-        url = "https://www.sciencefriday.com/wp-admin/admin-ajax.php?action=get_results&paged=%(next)s&" \
-              "sfid=%(sfid)s&post_types=%(ctype)s&_sft_topic=%(topic)s" % \
-              {"sfid": sfid, "ctype": ctype, "topic": topic, "next": page_count}
-    else:
-        url = "https://www.sciencefriday.com/wp-admin/admin-ajax.php?action=get_results&paged=%(next)s&" \
-              "sfid=%(sfid)s&post_types=%(ctype)s" % \
-              {"sfid": sfid, "ctype": ctype, "next": page_count}
+    # Add link to Alternitve Listing
+    if alt_url:
+        label = bold(plugin.localize(LIST_AUDIO) if "post_types=segment" in alt_url else plugin.localize(LIST_VIDEO))
+        item_dict = {"label": label, "callback": content_lister, "params": {"url": alt_url, "_title_": plugin.category}}
+        yield Listitem.from_dict(**item_dict)
 
     # Fetch & parse HTML Source
     ishd = bool(plugin.setting.get_int("video_quality", addon_id="script.module.youtube.dl"))
-    root_elem = urlquick.get(url).parse()
+    root_elem = urlquick.get(url_constructor(url)).parse()
 
     # Fetch next page
     next_url = root_elem.find(".//a[@rel='next']")
     if next_url is not None:  # pragma: no branch
-        yield Listitem.next_page(sfid=sfid, ctype=ctype, page_count=page_count+1)
+        url = url_constructor("/explore/?{}".format(next_url.get("href")))
+        yield Listitem.next_page(url=url)
 
     # Parse the elements
     for element in root_elem.iterfind(".//article"):
+        klasses = element.get("class")
+        if not ("type-video" in klasses or "type-segment" in klasses):
+            continue
+
         tag_a = element.find(".//a[@rel='bookmark']")
         item = Listitem()
         item.label = tag_a.text
@@ -125,8 +135,6 @@ def content_lister(plugin, sfid, ctype, topic=None, page_count=1):
 @Resolver.register
 def play_video(plugin, url):
     """
-    Site: https://www.sciencefriday.com/videos/reverse-engineering-europa/?post_types=video&_sft_topic=space
-
     :type plugin: Resolver
     :type url: unicode
     """
